@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { GiWaterTank } from 'react-icons/gi';
 import './App.css';
 
@@ -19,6 +18,7 @@ function App() {
     setSimulationStarted(true);
     setSimulationInterval(
       setInterval(() => {
+        // Simulation logic
         setWaterUnitsAtA((prevUnits) => (prevUnits.length > 0 ? prevUnits.slice(0, -1) : []));
         setWaterUnitsAtB((prevUnits) => (prevUnits.length < 10 ? [...prevUnits, 1] : prevUnits));
         setWaterUnitsAtC((prevUnits) => (prevUnits.length < 10 ? [...prevUnits, 1] : prevUnits));
@@ -32,22 +32,19 @@ function App() {
     clearInterval(simulationInterval);
   };
 
-  const calculateAmountSent = async () => {
-    try {
-      const response = await axios.post('http://localhost:2345/calculateAmount', {
-        waterUnitsAtA,
-      });
-      setWaterUnitsAtA(response.data.waterUnitsAtA);
-      setWaterUnitsAtB(response.data.waterUnitsAtB);
-      setWaterUnitsAtC(response.data.waterUnitsAtC);
-      setWaterUnitsAtD(response.data.waterUnitsAtD);
-      setCalculatedAmountAtA(response.data.calculatedAmountAtA);
-      setCalculatedAmountAtB(response.data.calculatedAmountAtB);
-      setCalculatedAmountAtC(response.data.calculatedAmountAtC);
-      setCalculatedAmountAtD(response.data.calculatedAmountAtD);
-    } catch (error) {
-      console.error('Error calculating amount sent:', error.message);
-    }
+  const calculateAmountSent = () => {
+    // Your calculation logic here
+    const amountAtA = waterUnitsAtA.length;
+    const amountAtB = waterUnitsAtB.length;
+    const amountAtC = waterUnitsAtC.length;
+    const amountAtD = waterUnitsAtD.length;
+
+    setCalculatedAmountAtA(amountAtA);
+    setCalculatedAmountAtB(amountAtB);
+    setCalculatedAmountAtC(amountAtC);
+    setCalculatedAmountAtD(amountAtD);
+
+    // Optionally, you can make an API call or perform additional logic here
   };
 
   useEffect(() => {
@@ -72,10 +69,6 @@ function App() {
           {waterUnitsAtA.map((unit, index) => (
             <div key={index} className="water-unit"></div>
           ))}
-          <div className="dotted-line"></div>
-          <div className="point pointA">
-            <p>A</p>
-          </div>
         </div>
       </div>
       <div className="tank">
@@ -92,21 +85,22 @@ function App() {
           {waterUnitsAtB.map((unit, index) => (
             <div key={index} className="water-unit"></div>
           ))}
-          <div className="dotted-line"></div>
-          <div className="point pointB">
-            <p>B</p>
-          </div>
         </div>
+      </div>
+      <div className="tank">
+        <GiWaterTank size={40} />
+        <div className="water-tank">
+          {waterUnitsAtC.map((unit, index) => (
+            <div key={index} className="water-unit"></div>
+          ))}
+        </div>
+        <div className="tank-label">C</div>
       </div>
       <div className="pipe">
         <div className="water-flow">
           {waterUnitsAtC.map((unit, index) => (
             <div key={index} className="water-unit"></div>
           ))}
-          <div className="dotted-line"></div>
-          <div className="point pointC">
-            <p>C</p>
-          </div>
         </div>
       </div>
       <div className="tank">
@@ -123,10 +117,6 @@ function App() {
           {waterUnitsAtD.map((unit, index) => (
             <div key={index} className="water-unit"></div>
           ))}
-          <div className="dotted-line"></div>
-          <div className="point pointD">
-            <p>D</p>
-          </div>
         </div>
       </div>
       <div className="result-container">
