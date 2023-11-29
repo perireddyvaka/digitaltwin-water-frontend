@@ -7,6 +7,8 @@ function App() {
   const [waterUnitsAtA, setWaterUnitsAtA] = useState(Array(10).fill(1));
   const [waterUnitsAtB, setWaterUnitsAtB] = useState([]);
   const [simulationInterval, setSimulationInterval] = useState(null);
+  const [calculatedAmountAtA, setCalculatedAmountAtA] = useState(null);
+  const [calculatedAmountAtB, setCalculatedAmountAtB] = useState(null);
 
   const startSimulation = () => {
     setSimulationStarted(true);
@@ -30,6 +32,8 @@ function App() {
       });
       setWaterUnitsAtA(response.data.waterUnitsAtA);
       setWaterUnitsAtB(response.data.waterUnitsAtB);
+      setCalculatedAmountAtA(response.data.calculatedAmountAtA);
+      setCalculatedAmountAtB(response.data.calculatedAmountAtB);
     } catch (error) {
       console.error('Error calculating amount sent:', error.message);
     }
@@ -65,7 +69,7 @@ function App() {
         <div className="point pointB">
           <p>B</p>
           {waterUnitsAtB.map((unit, index) => (
-            <div key={index} className="water-unit"></div>
+            <div key={index} className="water-unit-vertical"></div>
           ))}
         </div>
       </div>
@@ -76,6 +80,10 @@ function App() {
           ))}
         </div>
         <div className="tank-label">Tank B</div>
+      </div>
+      <div className="result-container">
+        <p>Calculated Amount at A: {calculatedAmountAtA}</p>
+        <p>Calculated Amount at B: {calculatedAmountAtB}</p>
       </div>
       <div>
         <button onClick={startSimulation} disabled={simulationStarted}>

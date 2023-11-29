@@ -29,7 +29,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  position: relative;
 }
 
 .water-flow {
@@ -39,6 +38,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  overflow: hidden;
 }
 
 .water-unit {
@@ -58,6 +58,46 @@
   }
 }
 
+.dotted-line {
+  position: absolute;
+  height: 100%;
+  width: 1px;
+  background-color: black;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+button {
+  margin-top: 10px;
+  padding: 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* ... (previous styles) */
+
+.result-container {
+  margin-top: 20px;
+}
+
+.water-unit-vertical {
+  width: 20px;
+  height: 20px;
+  background-color: blue;
+  margin-right: 5px;
+}
+
+.pipe.large {
+  width: 600px;
+  height: 200px; /* Increased height for better visualization */
+}
+
+.pipe.large .water-flow {
+  transition: width 3s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
 .point {
   position: absolute;
   text-align: center;
@@ -70,26 +110,20 @@
   transform: translate(0, -50%);
 }
 
-.dotted-line {
-  position: absolute;
-  height: 100%;
-  width: 1px;
-  background-color: black;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
 .pointB {
-  top: 50%;
-  right: 5px;
-  transform: translate(0, -50%);
+  top: 5px;
+  right: 50%;
+  transform: translate(50%, 0);
 }
 
-button {
-  margin-top: 10px;
-  padding: 10px;
-  font-size: 16px;
-  cursor: pointer;
+.pointC {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, 0);
+}
+
+.pointD {
+  bottom: 5px;
+  right: 50%;
+  transform: translate(50%, 0);
 }
