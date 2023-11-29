@@ -1,38 +1,95 @@
 .App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  margin-top: 50px;
 }
 
-.App-link {
-  color: #61dafb;
+.tank {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
+.water-tank {
+  display: flex;
+}
+
+.tank-label {
+  margin-top: 10px;
+}
+
+.pipe {
+  position: relative;
+  width: 500px;
+  height: 50px;
+  background-color: grey;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.water-flow {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.water-unit {
+  width: 20px;
+  height: 20px;
+  background-color: blue;
+  margin-right: 5px;
+}
+
+.water-flow.flowing {
+  animation: flowAnimation 1s linear infinite;
+}
+
+@keyframes flowAnimation {
   to {
-    transform: rotate(360deg);
+    transform: translateX(20px);
   }
+}
+
+.point {
+  position: absolute;
+  text-align: center;
+  width: 40px;
+}
+
+.pointA {
+  top: 50%;
+  left: 5px;
+  transform: translate(0, -50%);
+}
+
+.dotted-line {
+  position: absolute;
+  height: 100%;
+  width: 1px;
+  background-color: black;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.pointB {
+  top: 50%;
+  right: 5px;
+  transform: translate(0, -50%);
+}
+
+button {
+  margin-top: 10px;
+  padding: 10px;
+  font-size: 16px;
+  cursor: pointer;
 }
