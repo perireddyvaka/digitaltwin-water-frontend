@@ -19,13 +19,32 @@ function App() {
     setSimulationInterval(
       setInterval(() => {
         // Simulation logic
-        setWaterUnitsAtA((prevUnits) => (prevUnits.length > 0 ? prevUnits.slice(0, -1) : []));
-        setWaterUnitsAtB((prevUnits) => (prevUnits.length < 10 ? [...prevUnits, 1] : prevUnits));
-        setWaterUnitsAtC((prevUnits) => (prevUnits.length < 10 ? [...prevUnits, 1] : prevUnits));
-        setWaterUnitsAtD((prevUnits) => (prevUnits.length < 10 ? [...prevUnits, 1] : prevUnits));
+        if (waterUnitsAtA.length > 0) {
+          const unit = waterUnitsAtA.pop();
+          setWaterUnitsAtA([...waterUnitsAtA]); // Update A with remaining units
+  
+          // If A has more than 4 units, split and send to B and C
+          if (waterUnitsAtA.length > 4) {
+            // Distribute the unit evenly between B and C
+            setWaterUnitsAtB((prevUnits) => (prevUnits.length < 5 ? [...prevUnits, 1] : prevUnits));
+            setWaterUnitsAtC((prevUnits) => (prevUnits.length < 5 ? [...prevUnits, 1] : prevUnits));
+          } else {
+            // If A has 4 or fewer units, send the combined water from B and C to D
+            setTimeout(() => {
+              // Clear water from B and C
+              setWaterUnitsAtB([]);
+              setWaterUnitsAtC([]);
+              // Send the combined water to D
+              setWaterUnitsAtD((prevUnits) => (prevUnits.length < 10 ? [...prevUnits, 1] : prevUnits));
+            }, 2000);
+          }
+        }
       }, 1000)
     );
   };
+  
+  
+  
 
   const stopSimulation = () => {
     setSimulationStarted(false);
