@@ -1,16 +1,17 @@
 import React, { useRef, useEffect, useState } from 'react';
 import './App.css';
 
-const Particle = ({ x, y, color }) => {
+const Particle = ({ x, y, size, color }) => {
   return (
     <div
       style={{
         position: 'absolute',
         left: x,
         top: y,
-        width: '2px',
-        height: '2px',
+        width: size,
+        height: size,
         background: color,
+        borderRadius: '50%',
       }}
     />
   );
@@ -20,17 +21,19 @@ const App = () => {
   const canvasRef = useRef(null);
   const [particles, setParticles] = useState([]);
   const [isMouseDown, setIsMouseDown] = useState(false);
+  const [lastUpdateTime, setLastUpdateTime] = useState(0);
 
   useEffect(() => {
     // Initialize particles only once when the component mounts
     const initializeParticles = () => {
       const newParticles = [];
-      for (let i = 0; i < 200; i++) {
+      for (let i = 0; i < 500; i++) {
         newParticles.push({
           x: Math.random() * window.innerWidth,
           y: Math.random() * window.innerHeight,
           vx: 0,
           vy: 0,
+          size: Math.random() * 5 + 2, // Adjust size to make it look like water
           color: 'blue',
         });
       }
@@ -51,16 +54,21 @@ const App = () => {
 
   const handleMouseMove = (e) => {
     if (isMouseDown) {
-      setParticles((prevParticles) => [
-        ...prevParticles,
-        {
-          x: e.clientX,
-          y: e.clientY,
-          vx: 0,
-          vy: 0,
-          color: 'blue',
-        },
-      ]);
+      const currentTime = Date.now();
+      if (currentTime - lastUpdateTime > 10) {
+        setParticles((prevParticles) => [
+          ...prevParticles,
+          {
+            x: e.clientX,
+            y: e.clientY,
+            vx: 0,
+            vy: 0,
+            size: Math.random() * 5 + 2,
+            color: 'blue',
+          },
+        ]);
+        setLastUpdateTime(currentTime);
+      }
     }
   };
 
@@ -78,9 +86,9 @@ const App = () => {
             y: particle.y + particle.vy,
           };
 
-          if (updatedParticle.y > window.innerHeight - 2) {
+          if (updatedParticle.y > window.innerHeight - particle.size) {
             // Bounce off the bottom
-            updatedParticle.y = window.innerHeight - 2;
+            updatedParticle.y = window.innerHeight - particle.size;
             updatedParticle.vy *= -0.8; // Bounce with some loss
           }
 
@@ -102,9 +110,11 @@ const App = () => {
 
     const drawParticles = () => {
       ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-      particles.forEach(({ x, y, color }) => {
+      particles.forEach(({ x, y, size, color }) => {
         ctx.fillStyle = color;
-        ctx.fillRect(x, y, 2, 2);
+        ctx.beginPath();
+        ctx.arc(x, y, size, 0, 2 * Math.PI);
+        ctx.fill();
       });
     };
 
@@ -115,7 +125,7 @@ const App = () => {
     };
 
     animate();
-  }, [isMouseDown, particles]);
+  }, [isMouseDown, particles, lastUpdateTime]);
 
   return (
     <div>
