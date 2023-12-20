@@ -82,8 +82,10 @@ function App() {
     if (latitudeInput && longitudeInput) {
       const newMarker = {
         position: [parseFloat(latitudeInput), parseFloat(longitudeInput)],
-        flowrate: 0,
-        totalflow: 0,
+        temparature: 0,
+        u_tds: 0,
+        total_flow: 0,
+        v_tds: 0,
       };
       setMarkers([...markers, newMarker]);
       setLatitudeInput('');
@@ -126,8 +128,10 @@ function App() {
     if (latitudeInput && longitudeInput) {
       const newMarker = {
         position: [parseFloat(latitudeInput), parseFloat(longitudeInput)],
-        flowrate: 0,
-        totalflow: 0,
+        temparature: 0,
+        u_tds: 0,
+        total_flow: 0,
+        v_tds: 0,
       };
       setMarkers([...markers, newMarker]);
       setLatitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
