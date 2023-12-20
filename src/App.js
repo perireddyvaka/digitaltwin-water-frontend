@@ -49,8 +49,12 @@ function App() {
   const [clickedNode, setClickedNode] = useState(null);
   const [isAddingMarker, setIsAddingMarker] = useState(false);
 
+  const [clickedLatLng, setClickedLatLng] = useState(null);
+  const [clickedCoordinates, setClickedCoordinates] = useState(null);
 
-  
+// ... (rest of your code)
+
+
 
   const addMarker = () => {
     const newMarker = {
@@ -62,10 +66,45 @@ function App() {
     setIsAddingMarker(true);
   };
 
+// const handleMapClick = (e) => {
+
+//   const latitude = e.latlng.lat.toFixed(6); // Format latitude with 6 decimal places
+//   const longitude = e.latlng.lng.toFixed(6); // Format longitude with 6 decimal places
+//   const content = `You clicked at: Latitude: ${latitude}, Longitude: ${longitude}`;
+//   console.log("Event Called:");
+//   console.log(content);
+
+//   setClickedLatLng({ latitude, longitude });
+
+//   // Ensure that mapRef.current is defined before accessing leafletElement
+//   if (mapRef.current && mapRef.current.leafletElement) {
+//     L.popup()
+//       .setLatLng(e.latlng)
+//       .setContent(content)
+//       .openOn(mapRef.current.leafletElement);
+//   }
+
+//   // if (isAddingMarker) {
+//   //   setMarkers((prevMarkers) => {
+//   //     const newMarker = {
+//   //       position: [e.latlng.lat, e.latlng.lng],
+//   //       flowrate: 0,
+//   //       totalflow: 0,
+//   //     };
+//   //     setIsAddingMarker(false);
+//   //     return [...prevMarkers, newMarker];
+//   //   });
+//   // }
+// };
+
 const handleMapClick = (e) => {
-  const content = `You clicked at: ${e.latlng.toString()}`;
+  const latitude = e.latlng.lat.toFixed(6);
+  const longitude = e.latlng.lng.toFixed(6);
+  const content = `You clicked at: Latitude: ${latitude}, Longitude: ${longitude}`;
   console.log("Event Called:");
-  console.log(e.latlng.toString());// Fix the syntax here
+  console.log(content);
+
+  setClickedLatLng({ latitude, longitude });
 
   // Ensure that mapRef.current is defined before accessing leafletElement
   if (mapRef.current && mapRef.current.leafletElement) {
@@ -74,23 +113,13 @@ const handleMapClick = (e) => {
       .setContent(content)
       .openOn(mapRef.current.leafletElement);
   }
-
-  if (isAddingMarker) {
-    setMarkers((prevMarkers) => {
-      const newMarker = {
-        position: [e.latlng.lat, e.latlng.lng],
-        flowrate: 0,
-        totalflow: 0,
-      };
-      setIsAddingMarker(false);
-      return [...prevMarkers, newMarker];
-    });
-  }
 };
+
 
   
 
-  const mapRef = useRef();
+  const mapRef = useRef(); 
+  // const mapRef = null;
 
   const handleMarkerDragEnd = (index, event) => {
     const updatedMarkers = [...markers];
@@ -132,16 +161,17 @@ const handleMapClick = (e) => {
     }
   };
 
-  const handlePopupClick = (index) => {
-    const marker = markers[index];
-    if (marker) {
-      Swal.fire({
-        icon: 'info',
-        title: `Marker ${index + 1}`,
-        html: `<p>Latitude: ${marker.position[0]}</p><p>Longitude: ${marker.position[1]}</p>`,
-      });
-    }
-  };
+  // const handleMarkerClick = (index) => {
+  //   console.log("HandleMarkerClick is called")
+  //   const marker = markers[index];
+  //   if (marker) {
+  //     const lat = marker.position[0].toFixed(6);
+  //     const lng = marker.position[1].toFixed(6);
+  //     setClickedLatLng({ latitude: lat, longitude: lng });
+  //     setClickedCoordinates({ latitude: lat, longitude: lng });
+  //   }
+  // };
+
 
   const logMarkerCoordinates = () => {
     markers.forEach((marker, index) => {
@@ -150,13 +180,12 @@ const handleMapClick = (e) => {
   };
 
   useEffect(() => {
-    // mapRef.current = null;   
     const map = mapRef.current;
     if (map) {
-      console.log("I am clicked")
+      console.log("I am clicked");
       map.on('click', handleMapClick);
     }
-
+  
     const nodes = ["Node-1", "Node-2"];
     for (let i = 0; i < nodes.length; i++) {
       let url = "http://localhost:8080/desc/" + nodes[i];
@@ -164,7 +193,89 @@ const handleMapClick = (e) => {
         data[nodes[i]] = response.data;
       });
     }
-  }, []);
+  }, [handleMapClick]); 
+
+  const handlePopupClick = (index, e) => {
+    console.log("handlePopupClick is called when marker clicked");
+    const marker = markers[index];
+    if (marker) {
+      const lat = e.latlng.lat.toFixed(6);
+      const lng = e.latlng.lng.toFixed(6);
+      setClickedLatLng({ latitude: lat, longitude: lng });
+    }
+  };
+
+  const buildPopupContent = (index) => {
+    console.log("I am called buildPopupContent");
+    const marker = markers[index];
+    if (marker && clickedLatLng) {
+      return (
+        <div>
+          {`Marker `}
+          {index + 1}
+          {`- Clicked Coordinates:`}
+          <br />
+          Latitude: {clickedLatLng.latitude}
+          <br />
+          Longitude: {clickedLatLng.longitude}
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          {`Marker `}
+          {index + 1}
+          {`- Default Coordinates:`}
+          <br />
+          Latitude: {marker.position[0].toFixed(6)}
+          <br />
+          Longitude: {marker.position[1].toFixed(6)}
+        </div>
+      );; // Or some default content
+    }
+  };
+  
+
+  // const buildPopupContent = () => {
+  //   console.log("I am called buildPopupContent");
+  //   handlePopupClick()
+  //   if (clickedCoordinates) {
+  //     return (
+  //       <div>
+  //         {`Clicked Coordinates:`}
+  //         <br />
+  //         Latitude: {clickedCoordinates.latitude}
+  //         <br />
+  //         Longitude: {clickedCoordinates.longitude}
+  //       </div>
+  //     );
+  //   } else {
+  //     return (
+
+  //       <div>
+  //         Got Blank Values 
+  //       </div>
+  //     ); // Or some default content
+  //   }
+  // };
+
+
+  const getPopupContent = () => {
+    if (clickedLatLng) {
+      const content = (
+        <div>
+          {`- Clicked Coordinates:`}
+          <br />
+          Latitude: {clickedLatLng.latitude}
+          <br />
+          Longitude: {clickedLatLng.longitude}
+        </div>
+      );
+      return ReactDOMServer.renderToString(content);
+    } else {
+      return null;
+    }
+  };
 
   return (
     <div>
@@ -178,6 +289,7 @@ const handleMapClick = (e) => {
           scrollWheelZoom={false}
           onClick={handleMapClick}
         >
+
           <TileLayer url='https://tile.openstreetmap.org/{z}/{x}/{y}.png' />
           {data.map((nodeData, index) => (
             <CustomCircleMarker
@@ -192,6 +304,7 @@ const handleMapClick = (e) => {
               position={marker.position}
               draggable={true}
               onDragEnd={(event) => handleMarkerDragEnd(index, event)}
+              onClick={() => handleMarkerClick(index)}
               icon={
                 new L.divIcon({
                   className: 'custom-icon',
@@ -200,13 +313,8 @@ const handleMapClick = (e) => {
                 })
               }
             >
-              <Popup>
-                {`Marker ${index + 1}`}
-                <br />
-                Latitude: {marker.position[0]}
-                <br />
-                Longitude: {marker.position[1]}
-              </Popup>
+               <Popup>{buildPopupContent(index)}</Popup>
+               {/* <Popup>{handleMapClick(index)}</Popup> */}
             </Marker>
           ))}
           <Polyline pathOptions={{ color: 'green', dashArray: '5' }} positions={[position1, position2, position3]} />
