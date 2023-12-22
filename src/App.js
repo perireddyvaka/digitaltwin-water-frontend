@@ -13,12 +13,12 @@ const dt_node_1 = [17.44773337470836, 78.34853368169597];
 const dt_node_2 = [17.44711288989055, 78.34927584903512];
 const dt_node_3 = [17.446087802969153, 78.35051801020884];
 
-const newNode1 = [dt_node_1[0] - 0.0002, dt_node_1[1] - 0.0002];
-const newNode2 = [dt_node_2[0] - 0.0002, dt_node_2[1] - 0.0002];
-const newNode3 = [dt_node_3[0] - 0.0002, dt_node_3[1] - 0.0002];
-const newNode4 = [dt_node_1[0] + 0.0002, dt_node_1[1] + 0.0002];
-const newNode5 = [dt_node_2[0] + 0.0002, dt_node_2[1] + 0.0002];
-const newNode6 = [dt_node_3[0] + 0.0002, dt_node_3[1] + 0.0002];
+const newNode1 = [dt_node_1[0] - 0.0001, dt_node_1[1] - 0.0001];
+const newNode2 = [dt_node_2[0] - 0.0001, dt_node_2[1] - 0.0001];
+const newNode3 = [dt_node_3[0] - 0.0001, dt_node_3[1] - 0.0001];
+const newNode4 = [dt_node_1[0] + 0.0001, dt_node_1[1] + 0.0001];
+const newNode5 = [dt_node_2[0] + 0.0001, dt_node_2[1] + 0.0001];
+const newNode6 = [dt_node_3[0] + 0.0001, dt_node_3[1] + 0.0001];
 
 
 // Arranged in a order to Create Proper Rectangle 
@@ -128,9 +128,13 @@ function App() {
     console.log(latitude, longitude);
   
     const rectangleBounds = L.latLngBounds([newNode1, newNode2, newNode3, newNode6]);
+    console.log(
+      'Is point near rectangle:',
+      isPointNearLine([latitude, longitude], [newNode1, newNode2, newNode3, newNode6, newNode5, newNode4], 0.0001)
+    );
   
     // Check if the clicked point is inside the rectangle
-    if (rectangleBounds.contains([latitude, longitude])) {
+    if (isPointNearLine([latitude, longitude], [newNode1, newNode2, newNode3, newNode6, newNode5, newNode4], 0.0001)) {
       console.log("Marker added");
   
       // Get the distances to neighboring nodes
