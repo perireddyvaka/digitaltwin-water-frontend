@@ -22,6 +22,8 @@ const fetchData = (setDescriptorsData, arr, nodeID) => {
   // console.log("I am running every second")
 }
 
+
+
 function CustomCircleMarker({ nodeData, setClickedNode }) {
   const { "Node Location": position, "Node ID": nodeID, "Data String Parameters": arr } = nodeData;
   const [descriptorsData, setDescriptorsData] = useState({})

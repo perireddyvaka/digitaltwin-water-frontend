@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { MapContainer, TileLayer, Polyline, Marker, Popup, Polygon } from 'react-leaflet';
+import { MapContainer, TileLayer, Polyline, Marker, Popup, Polygon, Rectangle } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import CustomCircleMarker from './components/CustomCircleMarker';
 import { IoIosWater } from 'react-icons/io';
@@ -59,6 +59,8 @@ const data = [
     ]
   }
 ];
+
+
 
 function App() {
   const [markers, setMarkers] = useState([]);
@@ -238,6 +240,7 @@ function App() {
   };
 
   
+
   useEffect(() => {
     const map = mapRef.current;
     if (map) {
@@ -278,6 +281,21 @@ function App() {
       });
     }
   }, [mapRef.current]);
+  
+  const [popupContent, setPopupContent] = useState(null);
+
+  // const handleRectangleClick = (rectangleId) => {
+  //   // Define the content for the popup based on the clicked rectangle
+  //   if (rectangleId === 1) {
+  //     setPopupContent('Soil Tank!');
+  //   } else if (rectangleId === 2) {
+  //     setPopupContent('Salt Tank!');
+  //   }
+  //   // Add more conditions for other rectangles if needed
+  // };
+  const handleRectangleClick = (name) => {
+    setPopupContent(`Clicked on ${name}`);
+  };
 
   return (
     <div>
@@ -315,6 +333,21 @@ function App() {
             </Marker>
           ))}
           <Polyline pathOptions={{ color: 'green', dashArray: '5' }} positions={[dt_node_1, dt_node_2, dt_node_3]} />
+          {/* Add Rectangle components */}
+          <Rectangle bounds={[[17.447667994460527, 78.3487093448639], 
+          [17.447586140175613, 78.34859669208528]]} 
+          pathOptions={{ color: 'brown' }} 
+          eventHandlers={{ click: () => handleRectangleClick('Rectangle 1') }}
+          >
+          {popupContent && <Popup>{popupContent}</Popup>}
+          </Rectangle>
+          <Rectangle bounds={[[17.447023390971953, 78.34938526153566], 
+          [17.446931304573262, 78.34950327873231]]} 
+          pathOptions={{ color: 'orange' }}
+          eventHandlers={{ click: () => handleRectangleClick('Rectangle 2') }}
+          >
+          {popupContent && <Popup>{popupContent}</Popup>}
+          </Rectangle>
         </MapContainer>
       </div>
       <div style={{ textAlign: 'center', marginTop: '20px' }}>
