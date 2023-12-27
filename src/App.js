@@ -424,13 +424,26 @@ function App() {
           ))}
           <Polyline pathOptions={{ color: 'green', dashArray: '5' }} positions={[dt_node_1, dt_node_2, dt_node_3]} />
           {/* Add Rectangle components */}
-          <Rectangle bounds={[[17.447667994460527, 78.3487093448639], 
+          {/* <Rectangle bounds={[[17.447667994460527, 78.3487093448639], 
           [17.447586140175613, 78.34859669208528]]} 
           pathOptions={{ color: 'brown' }} 
           eventHandlers={{ click: () => handleRectangleClick('Rectangle 1') }}
-          >
+          > */}
+
+          <Rectangle
+            bounds={[
+              [17.447667994460527, 78.3487093448639],
+              [17.447586140175613, 78.34859669208528]
+            ]}
+            pathOptions={{
+              color: 'brown',
+              fill: true, // Set fill to true
+              fillColor: 'brown' // Set the fill color
+            }}
+            eventHandlers={{ click: () => handleRectangleClick('Rectangle 1') }}
+          />
           {popupContent && <Popup>{popupContent}</Popup>}
-          </Rectangle>
+
           <Rectangle bounds={[[17.447023390971953, 78.34938526153566], 
           [17.446931304573262, 78.34950327873231]]} 
           pathOptions={{ color: 'orange' }}
@@ -458,6 +471,17 @@ function App() {
             onChange={(e) => setLongitudeInput(e.target.value)}
           />
         </div>
+        <div style={{ textAlign: 'center', marginTop: '20px' }}>
+        {/* <h2>Legend</h2> */}
+        <div>
+          <span style={{ display: 'inline-block', width: '20px', height: '20px',  backgroundColor: 'rgba(165, 42, 42, 0.5)', border: '3px solid brown' }}></span>
+          <span style={{ marginLeft: '5px' }}>Soil Tank</span>
+
+          <span style={{ display: 'inline-block', width: '20px', height: '20px', backgroundColor: 'rgba(255, 165, 0, 0.5)',  border: '3px solid orange'  }}></span>
+          <span style={{ marginLeft: '5px' }}>Salt Tank</span>
+        </div>
+        {/* Add more legends for other rectangles if needed */}
+      </div>
         <button onClick={() => handleRemoveMarker(selectedMarkerIndex)}>Remove Marker</button>
         <button onClick={addMarker}>Add Marker</button>
         <button onClick={clearMarkers}>Clear Markers</button>
