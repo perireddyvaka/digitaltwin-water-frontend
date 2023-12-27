@@ -7,7 +7,7 @@ const fetchData = (setDescriptorsData, arr, nodeID) => {
   // Get all data of descriptors
   // create a descriptor: data mapping
   // console.log(nodeID)
-  const url = "http://127.0.0.1:8080/data/" + nodeID;
+  const url = "http://10.3.1.117:8080/data/" + nodeID;
   axios.get(url).then((response) => {
     const descData = {}
 
