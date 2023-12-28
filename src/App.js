@@ -365,7 +365,7 @@ function App() {
 
     const nodes = ["Node-1", "Node-2", "Node-3"];
     for (let i = 0; i < nodes.length; i++) {
-      let url = "http://localhost:8080/desc/" + nodes[i];
+      let url = "http://10.3.1.117:8080/desc/" + nodes[i];
       axios.get(url).then((response) => {
         data[nodes[i]] = response.data;
       });
