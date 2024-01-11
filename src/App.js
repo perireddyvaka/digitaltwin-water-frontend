@@ -13,19 +13,54 @@ const dt_node_1 = [17.44773337470836, 78.34853368169597];
 const dt_node_2 = [17.44711288989055, 78.34927584903512];
 const dt_node_3 = [17.446087802969153, 78.35051801020884];
 
-const newNode1 = [dt_node_1[0] - 0.0001, dt_node_1[1] - 0.0001];
-const newNode2 = [dt_node_2[0] - 0.0001, dt_node_2[1] - 0.0001];
-const newNode3 = [dt_node_3[0] - 0.0001, dt_node_3[1] - 0.0001];
-const newNode4 = [dt_node_1[0] + 0.0001, dt_node_1[1] + 0.0001];
-const newNode5 = [dt_node_2[0] + 0.0001, dt_node_2[1] + 0.0001];
-const newNode6 = [dt_node_3[0] + 0.0001, dt_node_3[1] + 0.0001];
+const newNode1 = [dt_node_1[0] - 0.00005, dt_node_1[1] - 0.00005];
+const newNode3 = [dt_node_3[0] - 0.00005, dt_node_3[1] - 0.00005];
+const newNode4 = [dt_node_1[0] + 0.00005, dt_node_1[1] + 0.00005];
+const newNode6 = [dt_node_3[0] + 0.00005, dt_node_3[1] + 0.00005];
 
+const n1 = [17.4475186984464, 78.34878444671632]
+const n2 = [17.447779877527292, 78.34900975227357]
+const n3 = [17.447467486818034, 78.34940671920778]
+const n4 = [17.4471960649475, 78.3491760492325]
+const n5 = [17.44675052251036, 78.34972321987152]
+const n6 = [17.447016823868076, 78.34993779659273]
+const n7 = [17.446622492872986, 78.3503830432892]
+const n8 = [17.446366433328517, 78.35017383098604]
 
 // Arranged in a order to Create Proper Rectangle 
-const polygonCoordinates = [newNode1, newNode2, newNode3, newNode6, newNode5, newNode4];
 
 
 const mapPosition = [17.44695, 78.34891];
+
+// async function getNodeLocation(nodeId) {
+//   let url = `http://127.0.0.1:8080/desc/${nodeId}`;
+
+//   try {
+//     let response = await fetch(url);
+//     let data = await response.json();
+
+//     // Extract and parse Node Location
+//     let nodeLocationStr = data['Node Location'];
+//     let nodeLocation = JSON.parse(nodeLocationStr);
+
+//     console.log(`Node ${nodeId} Location:`, nodeLocation);
+    
+//     // Further actions with the node location data can be performed here
+//     // For instance, updating state in React, displaying on the UI, etc.
+//   } catch (error) {
+//     console.error(`Error fetching data for Node ${nodeId}:`, error);
+//   }
+// }
+
+// // Usage example
+// getNodeLocation('Node-1');
+
+
+
+
+// // Call the function to display node location in the console
+// displayNodeLocation();
+
 
 const data = [
   {
@@ -90,23 +125,50 @@ function App() {
     }
   };
 
-  const isPointNearLine = (point, line, tolerance) => {
-    const [x, y] = point;
+  // const isPointNearLine = (point, line, tolerance) => {
+  //   const [x, y] = point;
   
-    for (let i = 0; i < line.length - 1; i++) {
-      const [x1, y1] = line[i];
-      const [x2, y2] = line[i + 1];
+  //   for (let i = 0; i < line.length - 1; i++) {
+  //     const [x1, y1] = line[i];
+  //     const [x2, y2] = line[i + 1];
   
-      // Calculate the distance from the point to the line segment
-      const distance = Math.hypot(x - x1, y - y1) + Math.hypot(x - x2, y - y2);
+  //     // Calculate the distance from the point to the line segment
+  //     const distance = Math.hypot(x - x1, y - y1) + Math.hypot(x - x2, y - y2);
   
-      // Check if the distance is within the tolerance
-      if (Math.abs(distance - Math.hypot(x2 - x1, y2 - y1)) <= tolerance) {
-        return true;
-      }
+  //     // Check if the distance is within the tolerance
+  //     if (Math.abs(distance - Math.hypot(x2 - x1, y2 - y1)) <= tolerance) {
+  //       return true;
+  //     }
+  //   }
+  
+  //   return false;
+  // };
+
+  const isPointNearLine2 = (point, fps) => {
+    const [x,y] = point; 
+    const [x1,y1] = fps[0];
+    const [x2,y2] = fps[1];
+    const [x3,y3] = fps[2];
+    const [x4,y4] = fps[3];
+
+    const slope1 = (y2-y1)/(x2-x1);
+    const slope2 = (y4-y3)/(x4-x3);
+
+    const slope3 = (y3-y1)/(x3-x1);
+    const slope4 = (y4-y2)/(x4-x2);
+  
+    const val1 = (y-y1) - slope1*(x-x1);
+    const val2 = (y-y3) - slope2*(x-x3);
+
+    const val3 = (y-y1) - slope3*(x-x1);
+    const val4 = (y-y2) - slope4*(x-x2); 
+
+    if(val1>0 && val2<0 && val3>0 && val4<0) 
+    {
+      return true;
     }
-  
     return false;
+    
   };
   
   const getNearestNode = (markerPosition) => {
@@ -129,25 +191,24 @@ function App() {
     setClickedLatLng({ latitude, longitude });
     console.log(latitude, longitude);
   
-    const rectangleBounds = L.latLngBounds([newNode1, newNode2, newNode3, newNode6]);
     console.log(
       'Is point near rectangle:',
-      isPointNearLine([latitude, longitude], [newNode1, newNode2, newNode3, newNode6, newNode5, newNode4], 0.0001)
+      isPointNearLine2([latitude, longitude], [newNode1,newNode3, newNode4, newNode6])
     );
   
     // Check if the clicked point is inside the rectangle
-    if (isPointNearLine([latitude, longitude], [newNode1, newNode2, newNode3, newNode6, newNode5, newNode4], 0.0001)) {
+    if (isPointNearLine2([latitude, longitude], [newNode1,newNode3, newNode4, newNode6])) {
       console.log("Marker added");
   
       // Get the distances to neighboring nodes
-      const distanceToNode1 = mapRef.current.distance([latitude, longitude], newNode1);
-      const distanceToNode2 = mapRef.current.distance([latitude, longitude], newNode2);
-      const distanceToNode3 = mapRef.current.distance([latitude, longitude], newNode3);
+      const distanceToNode1 = mapRef.current.distance([latitude, longitude], dt_node_1);
+      const distanceToNode2 = mapRef.current.distance([latitude, longitude], dt_node_2);
+      const distanceToNode3 = mapRef.current.distance([latitude, longitude], dt_node_3);
   
       // Calculate the total distance between neighboring nodes
-      const totalDistance1 = mapRef.current.distance(newNode1, newNode2);
-      const totalDistance2 = mapRef.current.distance(newNode2, newNode3);
-      const totalDistance3 = mapRef.current.distance(newNode3, newNode1);
+      const totalDistance1 = mapRef.current.distance(dt_node_1,dt_node_2);
+      const totalDistance2 = mapRef.current.distance(dt_node_2, dt_node_3);
+      const totalDistance3 = mapRef.current.distance(dt_node_3, dt_node_1);
   
       // Calculate the percentages along the line segment
       const percentage1 = (distanceToNode1 / totalDistance1) * 100;
@@ -158,9 +219,9 @@ function App() {
         percentage2 = percentage2 - 100;
       }
   
-      console.log('Nearest Node 1:', newNode1);
-      console.log('Nearest Node 2:', newNode2);
-      console.log('Nearest Node 3:', newNode3);
+      console.log('Nearest Node 1:', dt_node_1);
+      console.log('Nearest Node 2:', dt_node_2);
+      console.log('Nearest Node 3:', dt_node_3);
       console.log('Distance to Nearest Node 1:', distanceToNode1.toFixed(2), 'meters');
       console.log('Distance to Nearest Node 2:', distanceToNode2.toFixed(2), 'meters');
       console.log('Distance to Nearest Node 3:', distanceToNode3.toFixed(2), 'meters');
@@ -188,6 +249,7 @@ function App() {
       });
     }
   };
+  
   
   
 
@@ -352,20 +414,18 @@ function App() {
 
     // Log new coordinates
     console.log('New Node 1:', newNode1);
-    console.log('New Node 2:', newNode2);
     console.log('New Node 3:', newNode3);
     console.log('New Node 4:', newNode4);
-    console.log('New Node 5:', newNode5);
     console.log('New Node 6:', newNode6);
 
     // Draw a polygon with the new coordinates in red color
-    L.polygon(polygonCoordinates, { color: 'red' }).addTo(mapRef.current);
+    // L.polygon(polygonCoordinates, { color: 'red' }).addTo(mapRef.current);
 
   }
 
     const nodes = ["Node-1", "Node-2", "Node-3"];
     for (let i = 0; i < nodes.length; i++) {
-      let url = "http://10.3.1.117:8080/desc/" + nodes[i];
+      let url = "http://localhost:8080/desc/" + nodes[i];
       axios.get(url).then((response) => {
         data[nodes[i]] = response.data;
       });
@@ -423,27 +483,16 @@ function App() {
             </Marker>
           ))}
           <Polyline pathOptions={{ color: 'green', dashArray: '5' }} positions={[dt_node_1, dt_node_2, dt_node_3]} />
+          <Polyline pathOptions={{ color: 'green', dashArray: '5' }} positions={[n1, n2, n3, n4]} />
+          <Polyline pathOptions={{ color: 'green', dashArray: '5' }} positions={[n5, n6, n7, n8]} />
           {/* Add Rectangle components */}
-          {/* <Rectangle bounds={[[17.447667994460527, 78.3487093448639], 
+          <Rectangle bounds={[[17.447667994460527, 78.3487093448639], 
           [17.447586140175613, 78.34859669208528]]} 
           pathOptions={{ color: 'brown' }} 
           eventHandlers={{ click: () => handleRectangleClick('Rectangle 1') }}
-          > */}
-
-          <Rectangle
-            bounds={[
-              [17.447667994460527, 78.3487093448639],
-              [17.447586140175613, 78.34859669208528]
-            ]}
-            pathOptions={{
-              color: 'brown',
-              fill: true, // Set fill to true
-              fillColor: 'brown' // Set the fill color
-            }}
-            eventHandlers={{ click: () => handleRectangleClick('Rectangle 1') }}
-          />
+          >
           {popupContent && <Popup>{popupContent}</Popup>}
-
+          </Rectangle>
           <Rectangle bounds={[[17.447023390971953, 78.34938526153566], 
           [17.446931304573262, 78.34950327873231]]} 
           pathOptions={{ color: 'orange' }}
@@ -471,17 +520,6 @@ function App() {
             onChange={(e) => setLongitudeInput(e.target.value)}
           />
         </div>
-        <div style={{ textAlign: 'center', marginTop: '20px' }}>
-        {/* <h2>Legend</h2> */}
-        <div>
-          <span style={{ display: 'inline-block', width: '20px', height: '20px',  backgroundColor: 'rgba(165, 42, 42, 0.5)', border: '3px solid brown' }}></span>
-          <span style={{ marginLeft: '5px' }}>Soil Tank</span>
-
-          <span style={{ display: 'inline-block', width: '20px', height: '20px', backgroundColor: 'rgba(255, 165, 0, 0.5)',  border: '3px solid orange'  }}></span>
-          <span style={{ marginLeft: '5px' }}>Salt Tank</span>
-        </div>
-        {/* Add more legends for other rectangles if needed */}
-      </div>
         <button onClick={() => handleRemoveMarker(selectedMarkerIndex)}>Remove Marker</button>
         <button onClick={addMarker}>Add Marker</button>
         <button onClick={clearMarkers}>Clear Markers</button>
