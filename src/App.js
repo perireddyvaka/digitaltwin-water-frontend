@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { MapContainer, TileLayer, Polyline, Marker, Popup, Polygon } from 'react-leaflet';
+import { MapContainer, TileLayer, Polyline, Marker, Popup, Polygon, Rectangle } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import CustomCircleMarker from './components/CustomCircleMarker';
 import { IoIosWater } from 'react-icons/io';
@@ -13,12 +13,12 @@ const dt_node_1 = [17.44773337470836, 78.34853368169597];
 const dt_node_2 = [17.44711288989055, 78.34927584903512];
 const dt_node_3 = [17.446087802969153, 78.35051801020884];
 
-const newNode1 = [dt_node_1[0] - 0.0002, dt_node_1[1] - 0.0002];
-const newNode2 = [dt_node_2[0] - 0.0002, dt_node_2[1] - 0.0002];
-const newNode3 = [dt_node_3[0] - 0.0002, dt_node_3[1] - 0.0002];
-const newNode4 = [dt_node_1[0] + 0.0002, dt_node_1[1] + 0.0002];
-const newNode5 = [dt_node_2[0] + 0.0002, dt_node_2[1] + 0.0002];
-const newNode6 = [dt_node_3[0] + 0.0002, dt_node_3[1] + 0.0002];
+const newNode1 = [dt_node_1[0] - 0.0001, dt_node_1[1] - 0.0001];
+const newNode2 = [dt_node_2[0] - 0.0001, dt_node_2[1] - 0.0001];
+const newNode3 = [dt_node_3[0] - 0.0001, dt_node_3[1] - 0.0001];
+const newNode4 = [dt_node_1[0] + 0.0001, dt_node_1[1] + 0.0001];
+const newNode5 = [dt_node_2[0] + 0.0001, dt_node_2[1] + 0.0001];
+const newNode6 = [dt_node_3[0] + 0.0001, dt_node_3[1] + 0.0001];
 
 
 // Arranged in a order to Create Proper Rectangle 
@@ -60,6 +60,8 @@ const data = [
   }
 ];
 
+
+
 function App() {
   const [markers, setMarkers] = useState([]);
   const [clickedNode, setClickedNode] = useState(null);
@@ -71,6 +73,8 @@ function App() {
   const [latitudeInput, setLatitudeInput] = useState('17.447356');
   const [longitudeInput, setLongitudeInput] = useState('78.349047');
   const [selectedMarkerIndex, setSelectedMarkerIndex] = useState(null);
+
+  const [lastNodeCrossed, setLastNodeCrossed] = useState(null); 
 
   const mapRef = useRef();
 
@@ -105,69 +109,144 @@ function App() {
     return false;
   };
   
-  const handleMapClick = (e) => {
-  console.log("handleMapClick Called ");
-  const latitude = e.latlng.lat;
-  const longitude = e.latlng.lng;
-  setClickedLatLng({ latitude, longitude });
-  console.log(latitude, longitude);
-
-  // Log if the point is near the rectangle
-  console.log(
-    'Is point near rectangle:',
-    isPointNearLine([latitude, longitude], [newNode1, newNode2, newNode3, newNode6, newNode5, newNode4], 0.0001)
-  );
-
-  // Check if the clicked point is close enough to the rectangle
-  if (isPointNearLine([latitude, longitude], [newNode1, newNode2, newNode3, newNode6, newNode5, newNode4], 0.0001)) {
-    // The clicked point is inside the rectangle, proceed to add a marker
-    console.log("Marker added");
-    const newMarker = {
-      position: [latitude, longitude],
-      flowrate: 0,
-      totalflow: 0,
+  const getNearestNode = (markerPosition) => {
+    const distances = {
+      Node1: mapRef.current.distance(markerPosition, [dt_node_1[0], dt_node_1[1]]),
+      Node2: mapRef.current.distance(markerPosition, [dt_node_2[0], dt_node_2[1]]),
+      Node3: mapRef.current.distance(markerPosition, [dt_node_3[0], dt_node_3[1]]),
     };
-    setMarkers([...markers, newMarker]);
-    setLatitudeInput('');
-    setLongitudeInput('');
-  } else {
-    // The clicked point is not inside the rectangle, show an alert
-    console.log("Invalid Placement");
-    Swal.fire({
-      title: 'Invalid Placement',
-      text: 'Please place the marker inside the rectangle.',
-      icon: 'error',
-      confirmButtonText: 'OK',
-    });
-  }
-};
+  
+    const nearestNode = Object.keys(distances).reduce((a, b) => (distances[a] < distances[b] ? a : b));
+  
+    return { node: nearestNode, distance: distances[nearestNode] };
+  };
+  
 
-// const isPointInsideRectangle = (point, rectangle) => {
-//   const [x, y] = point;
-//   const [x1, y1, x2, y2, x3, y3, x4, y4] = rectangle;
+  const handleMapClick = (e) => {
+    console.log("handleMapClick Called ");
+    const latitude = e.latlng.lat;
+    const longitude = e.latlng.lng;
+    setClickedLatLng({ latitude, longitude });
+    console.log(latitude, longitude);
+  
+    const rectangleBounds = L.latLngBounds([newNode1, newNode2, newNode3, newNode6]);
+    console.log(
+      'Is point near rectangle:',
+      isPointNearLine([latitude, longitude], [newNode1, newNode2, newNode3, newNode6, newNode5, newNode4], 0.0001)
+    );
+  
+    // Check if the clicked point is inside the rectangle
+    if (isPointNearLine([latitude, longitude], [newNode1, newNode2, newNode3, newNode6, newNode5, newNode4], 0.0001)) {
+      console.log("Marker added");
+  
+      // Get the distances to neighboring nodes
+      const distanceToNode1 = mapRef.current.distance([latitude, longitude], newNode1);
+      const distanceToNode2 = mapRef.current.distance([latitude, longitude], newNode2);
+      const distanceToNode3 = mapRef.current.distance([latitude, longitude], newNode3);
+  
+      // Calculate the total distance between neighboring nodes
+      const totalDistance1 = mapRef.current.distance(newNode1, newNode2);
+      const totalDistance2 = mapRef.current.distance(newNode2, newNode3);
+      const totalDistance3 = mapRef.current.distance(newNode3, newNode1);
+  
+      // Calculate the percentages along the line segment
+      const percentage1 = (distanceToNode1 / totalDistance1) * 100;
+      let percentage2 = (distanceToNode2 / totalDistance2) * 100;
+      const percentage3 = (distanceToNode3 / totalDistance3) * 100;
 
-//   const isInside = (x, y, x1, y1, x2, y2, x3, y3) => {
-//     const d1 = (x - x1) * (y2 - y1) - (y - y1) * (x2 - x1);
-//     const d2 = (x - x2) * (y3 - y2) - (y - y2) * (x3 - x2);
-//     const d3 = (x - x3) * (y4 - y3) - (y - y3) * (x4 - x3);
-//     const d4 = (x - x4) * (y1 - y4) - (y - y4) * (x1 - x4);
-//     return (d1 > 0 && d2 > 0 && d3 > 0 && d4 > 0) || (d1 < 0 && d2 < 0 && d3 < 0 && d4 < 0);
-//   };
+      if (percentage1 < 100) {
+        percentage2 = percentage2 - 100;
+      }
+  
+      console.log('Nearest Node 1:', newNode1);
+      console.log('Nearest Node 2:', newNode2);
+      console.log('Nearest Node 3:', newNode3);
+      console.log('Distance to Nearest Node 1:', distanceToNode1.toFixed(2), 'meters');
+      console.log('Distance to Nearest Node 2:', distanceToNode2.toFixed(2), 'meters');
+      console.log('Distance to Nearest Node 3:', distanceToNode3.toFixed(2), 'meters');
+      console.log('Percentage along the Line 1-2:', percentage1.toFixed(2), '%');
+      console.log('Percentage along the Line 2-3:', percentage2.toFixed(2), '%');
+      console.log('Percentage along the Line 3-1:', percentage3.toFixed(2), '%');
+  
+      // Proceed to add a marker
+      const newMarker = {
+        position: [latitude, longitude],
+        flowrate: 0,
+        totalflow: 0,
+      };
+      setMarkers((prevMarkers) => [...prevMarkers, newMarker]);
+      setLatitudeInput('');
+      setLongitudeInput('');
+    } else {
+      // The clicked point is not inside the rectangle, show an alert
+      console.log("Invalid Placement - Outside Rectangle");
+      Swal.fire({
+        title: 'Invalid Placement',
+        text: 'Please place the marker inside the rectangle.',
+        icon: 'error',
+        confirmButtonText: 'OK',
+      });
+    }
+  };
+  
+  
 
-//   return isInside(x, y, x1, y1, x2, y2, x3, y3) || isInside(x, y, x1, y1, x4, y4, x3, y3);
-// };
+  // Nearest Node Calculator with distance
+  // const handleMapClick = (e) => {
+  //   console.log("handleMapClick Called ");
+  //   const latitude = e.latlng.lat;
+  //   const longitude = e.latlng.lng;
+  //   setClickedLatLng({ latitude, longitude });
+  //   console.log(latitude, longitude);
+  
+  //   const rectangleBounds = L.latLngBounds([newNode1, newNode2, newNode3, newNode6]);
+  
+  //   // Check if the clicked point is inside the rectangle
+  //   if (rectangleBounds.contains([latitude, longitude])) {
+  //     console.log("Marker added");
+  //     const newMarker = {
+  //       position: [latitude, longitude],
+  //       flowrate: 0,
+  //       totalflow: 0,
+  //     };
+  //     setMarkers([...markers, newMarker]);
+  //     setLatitudeInput('');
+  //     setLongitudeInput('');
+  
+  //     // Get the nearest node details
+  //     const nearestNodeDetails = getNearestNode([latitude, longitude]);
+  //     console.log('Nearest Node:', nearestNodeDetails.node);
+  //     console.log('Distance to Nearest Node:', nearestNodeDetails.distance.toFixed(2), 'meters');
+  //   } else {
+  //     // The clicked point is not inside the rectangle, show an alert
+  //     console.log("Invalid Placement");
+  //     Swal.fire({
+  //       title: 'Invalid Placement',
+  //       text: 'Please place the marker inside the rectangle.',
+  //       icon: 'error',
+  //       confirmButtonText: 'OK',
+  //     });
+  //   }
+  // };
 
-// const handleMapClick = (e) => {
+  
+//Rectangle Working Code 
+//   const handleMapClick = (e) => {
 //   console.log("handleMapClick Called ");
 //   const latitude = e.latlng.lat;
 //   const longitude = e.latlng.lng;
 //   setClickedLatLng({ latitude, longitude });
 //   console.log(latitude, longitude);
 
-//   const rectangleBounds = L.latLngBounds([newNode1, newNode2, newNode3, newNode6, newNode5, newNode4]);
+//   // Log if the point is near the rectangle
+//   console.log(
+//     'Is point near rectangle:',
+//     isPointNearLine([latitude, longitude], [newNode1, newNode2, newNode3, newNode6, newNode5, newNode4], 0.0001)
+//   );
 
-//   // Check if the clicked point is inside the rectangle
-//   if (rectangleBounds.contains([latitude, longitude])) {
+//   // Check if the clicked point is close enough to the rectangle
+//   if (isPointNearLine([latitude, longitude], [newNode1, newNode2, newNode3, newNode6, newNode5, newNode4], 0.0001)) {
+//     // The clicked point is inside the rectangle, proceed to add a marker
 //     console.log("Marker added");
 //     const newMarker = {
 //       position: [latitude, longitude],
@@ -189,7 +268,20 @@ function App() {
 //   }
 // };
 
+// const isPointInsideRectangle = (point, rectangle) => {
+//   const [x, y] = point;
+//   const [x1, y1, x2, y2, x3, y3, x4, y4] = rectangle;
 
+//   const isInside = (x, y, x1, y1, x2, y2, x3, y3) => {
+//     const d1 = (x - x1) * (y2 - y1) - (y - y1) * (x2 - x1);
+//     const d2 = (x - x2) * (y3 - y2) - (y - y2) * (x3 - x2);
+//     const d3 = (x - x3) * (y4 - y3) - (y - y3) * (x4 - x3);
+//     const d4 = (x - x4) * (y1 - y4) - (y - y4) * (x1 - x4);
+//     return (d1 > 0 && d2 > 0 && d3 > 0 && d4 > 0) || (d1 < 0 && d2 < 0 && d3 < 0 && d4 < 0);
+//   };
+
+//   return isInside(x, y, x1, y1, x2, y2, x3, y3) || isInside(x, y, x1, y1, x4, y4, x3, y3);
+// };
 
   const logMarkerCoordinates = () => {
     markers.forEach((marker, index) => {
@@ -238,6 +330,7 @@ function App() {
   };
 
   
+
   useEffect(() => {
     const map = mapRef.current;
     if (map) {
@@ -272,12 +365,27 @@ function App() {
 
     const nodes = ["Node-1", "Node-2", "Node-3"];
     for (let i = 0; i < nodes.length; i++) {
-      let url = "http://localhost:8080/desc/" + nodes[i];
+      let url = "http://10.3.1.117:8080/desc/" + nodes[i];
       axios.get(url).then((response) => {
         data[nodes[i]] = response.data;
       });
     }
   }, [mapRef.current]);
+  
+  const [popupContent, setPopupContent] = useState(null);
+
+  // const handleRectangleClick = (rectangleId) => {
+  //   // Define the content for the popup based on the clicked rectangle
+  //   if (rectangleId === 1) {
+  //     setPopupContent('Soil Tank!');
+  //   } else if (rectangleId === 2) {
+  //     setPopupContent('Salt Tank!');
+  //   }
+  //   // Add more conditions for other rectangles if needed
+  // };
+  const handleRectangleClick = (name) => {
+    setPopupContent(`Clicked on ${name}`);
+  };
 
   return (
     <div>
@@ -315,6 +423,34 @@ function App() {
             </Marker>
           ))}
           <Polyline pathOptions={{ color: 'green', dashArray: '5' }} positions={[dt_node_1, dt_node_2, dt_node_3]} />
+          {/* Add Rectangle components */}
+          {/* <Rectangle bounds={[[17.447667994460527, 78.3487093448639], 
+          [17.447586140175613, 78.34859669208528]]} 
+          pathOptions={{ color: 'brown' }} 
+          eventHandlers={{ click: () => handleRectangleClick('Rectangle 1') }}
+          > */}
+
+          <Rectangle
+            bounds={[
+              [17.447667994460527, 78.3487093448639],
+              [17.447586140175613, 78.34859669208528]
+            ]}
+            pathOptions={{
+              color: 'brown',
+              fill: true, // Set fill to true
+              fillColor: 'brown' // Set the fill color
+            }}
+            eventHandlers={{ click: () => handleRectangleClick('Rectangle 1') }}
+          />
+          {popupContent && <Popup>{popupContent}</Popup>}
+
+          <Rectangle bounds={[[17.447023390971953, 78.34938526153566], 
+          [17.446931304573262, 78.34950327873231]]} 
+          pathOptions={{ color: 'orange' }}
+          eventHandlers={{ click: () => handleRectangleClick('Rectangle 2') }}
+          >
+          {popupContent && <Popup>{popupContent}</Popup>}
+          </Rectangle>
         </MapContainer>
       </div>
       <div style={{ textAlign: 'center', marginTop: '20px' }}>
@@ -335,6 +471,17 @@ function App() {
             onChange={(e) => setLongitudeInput(e.target.value)}
           />
         </div>
+        <div style={{ textAlign: 'center', marginTop: '20px' }}>
+        {/* <h2>Legend</h2> */}
+        <div>
+          <span style={{ display: 'inline-block', width: '20px', height: '20px',  backgroundColor: 'rgba(165, 42, 42, 0.5)', border: '3px solid brown' }}></span>
+          <span style={{ marginLeft: '5px' }}>Soil Tank</span>
+
+          <span style={{ display: 'inline-block', width: '20px', height: '20px', backgroundColor: 'rgba(255, 165, 0, 0.5)',  border: '3px solid orange'  }}></span>
+          <span style={{ marginLeft: '5px' }}>Salt Tank</span>
+        </div>
+        {/* Add more legends for other rectangles if needed */}
+      </div>
         <button onClick={() => handleRemoveMarker(selectedMarkerIndex)}>Remove Marker</button>
         <button onClick={addMarker}>Add Marker</button>
         <button onClick={clearMarkers}>Clear Markers</button>
