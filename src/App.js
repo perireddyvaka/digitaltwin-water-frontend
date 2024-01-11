@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Polyline, Marker, Popup, Polygon, Rectangle } 
 import 'leaflet/dist/leaflet.css';
 import CustomCircleMarker from './components/CustomCircleMarker';
 import { IoIosWater } from 'react-icons/io';
+import { BsFillBoxFill } from "react-icons/bs";
 import L from 'leaflet';
 import ReactDOMServer from 'react-dom/server';
 import Swal from 'sweetalert2';
@@ -26,6 +27,36 @@ const polygonCoordinates = [newNode1, newNode2, newNode3, newNode6, newNode5, ne
 
 
 const mapPosition = [17.44695, 78.34891];
+
+// async function getNodeLocation(nodeId) {
+//   let url = `http://127.0.0.1:8080/desc/${nodeId}`;
+
+//   try {
+//     let response = await fetch(url);
+//     let data = await response.json();
+
+//     // Extract and parse Node Location
+//     let nodeLocationStr = data['Node Location'];
+//     let nodeLocation = JSON.parse(nodeLocationStr);
+
+//     console.log(`Node ${nodeId} Location:`, nodeLocation);
+    
+//     // Further actions with the node location data can be performed here
+//     // For instance, updating state in React, displaying on the UI, etc.
+//   } catch (error) {
+//     console.error(`Error fetching data for Node ${nodeId}:`, error);
+//   }
+// }
+
+// // Usage example
+// getNodeLocation('Node-1');
+
+
+
+
+// // Call the function to display node location in the console
+// displayNodeLocation();
+
 
 const data = [
   {
@@ -64,6 +95,8 @@ const data = [
 
 function App() {
   const [markers, setMarkers] = useState([]);
+  const [saltmarkers, setSaltMarkers] = useState([]);
+  const [soilmarkers, setSoilMarkers] = useState([]);
   const [clickedNode, setClickedNode] = useState(null);
   const [isAddingMarker, setIsAddingMarker] = useState(false);
 
@@ -81,11 +114,31 @@ function App() {
   const clearMarkers = () => {
     setMarkers([]);
   };
+  const clearSaltMarkers = () => {
+    setSaltMarkers([]);
+  };
+  const clearSoilMarkers = () => {
+    setSoilMarkers([]);
+  };
 
   const handleRemoveMarker = (index) => {
     if (index !== null) {
       const updatedMarkers = markers.filter((_, i) => i !== index);
       setMarkers(updatedMarkers);
+      setSelectedMarkerIndex(null);
+    }
+  };
+  const handleRemoveSaltMarker = (index) => {
+    if (index !== null) {
+      const updatedSaltMarkers = saltmarkers.filter((_, i) => i !== index);
+      setSaltMarkers(updatedSaltMarkers);
+      setSelectedMarkerIndex(null);
+    }
+  };
+  const handleRemoveSoilMarker = (index) => {
+    if (index !== null) {
+      const updatedSoilMarkers = soilmarkers.filter((_, i) => i !== index);
+      setSoilMarkers(updatedSoilMarkers);
       setSelectedMarkerIndex(null);
     }
   };
@@ -174,9 +227,8 @@ function App() {
         flowrate: 0,
         totalflow: 0,
       };
-      setMarkers((prevMarkers) => [...prevMarkers, newMarker]);
-      setLatitudeInput('');
-      setLongitudeInput('');
+      setLatitudeInput(latitude);
+      setLongitudeInput(longitude);
     } else {
       // The clicked point is not inside the rectangle, show an alert
       console.log("Invalid Placement - Outside Rectangle");
@@ -314,6 +366,56 @@ function App() {
     }
   };
 
+  const buildSaltPopupContent = (index) => {
+    const marker = saltmarkers[index];
+    if (marker && clickedLatLng) {
+      return (
+        <div>
+          {`Marker ${index + 1} - Clicked Coordinates:`}
+          <br />
+          Latitude: {clickedLatLng.latitude}
+          <br />
+          Longitude: {clickedLatLng.longitude}
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          {`Marker ${index + 1} - Coordinates:`}
+          <br />
+          Latitude: {marker.position[0].toFixed(6)}
+          <br />
+          Longitude: {marker.position[1].toFixed(6)}
+        </div>
+      );
+    }
+  };
+
+  const buildSoilPopupContent = (index) => {
+    const marker = soilmarkers[index];
+    if (marker && clickedLatLng) {
+      return (
+        <div>
+          {`Marker ${index + 1} - Clicked Coordinates:`}
+          <br />
+          Latitude: {clickedLatLng.latitude}
+          <br />
+          Longitude: {clickedLatLng.longitude}
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          {`Marker ${index + 1} - Coordinates:`}
+          <br />
+          Latitude: {marker.position[0].toFixed(6)}
+          <br />
+          Longitude: {marker.position[1].toFixed(6)}
+        </div>
+      );
+    }
+  };
+
   const addMarker = () => {
     if (latitudeInput && longitudeInput) {
       const newMarker = {
@@ -324,6 +426,36 @@ function App() {
         v_tds: 0,
       };
       setMarkers([...markers, newMarker]);
+      setLatitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
+      setLongitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
+    }
+  };
+
+  const addSaltMarker = () => {
+    if (latitudeInput && longitudeInput) {
+      const newMarker = {
+        position: [parseFloat(latitudeInput), parseFloat(longitudeInput)],
+        temparature: 0,
+        u_tds: 0,
+        total_flow: 0,
+        v_tds: 0,
+      };
+      setSaltMarkers([...saltmarkers, newMarker]);
+      setLatitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
+      setLongitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
+    }
+  };
+
+  const addSoilMarker = () => {
+    if (latitudeInput && longitudeInput) {
+      const newMarker = {
+        position: [parseFloat(latitudeInput), parseFloat(longitudeInput)],
+        temparature: 0,
+        u_tds: 0,
+        total_flow: 0,
+        v_tds: 0,
+      };
+      setSoilMarkers([...soilmarkers, newMarker]);
       setLatitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
       setLongitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
     }
@@ -365,7 +497,7 @@ function App() {
 
     const nodes = ["Node-1", "Node-2", "Node-3"];
     for (let i = 0; i < nodes.length; i++) {
-      let url = "http://10.3.1.117:8080/desc/" + nodes[i];
+      let url = "http://localhost:8080/desc/" + nodes[i];
       axios.get(url).then((response) => {
         data[nodes[i]] = response.data;
       });
@@ -422,28 +554,47 @@ function App() {
               <Popup>{buildPopupContent(index)}</Popup>
             </Marker>
           ))}
+
+          {saltmarkers.map((marker, index) => (
+            <Marker
+              key={index}
+              position={marker.position}
+              icon={
+                new L.divIcon({
+                  className: 'custom-icon',
+                  html: ReactDOMServer.renderToString(<BsFillBoxFill size={30} color="orange" />),
+                  iconSize: [30, 30],
+                })
+              }
+            >
+              <Popup>{buildSaltPopupContent(index)}</Popup>
+            </Marker>
+          ))}
+
+          {soilmarkers.map((marker, index) => (
+            <Marker
+              key={index}
+              position={marker.position}
+              icon={
+                new L.divIcon({
+                  className: 'custom-icon',
+                  html: ReactDOMServer.renderToString(<BsFillBoxFill size={30} color="brown" />),
+                  iconSize: [30, 30],
+                })
+              }
+            >
+              <Popup>{buildSoilPopupContent(index)}</Popup>
+            </Marker>
+          ))}
           <Polyline pathOptions={{ color: 'green', dashArray: '5' }} positions={[dt_node_1, dt_node_2, dt_node_3]} />
           {/* Add Rectangle components */}
-          {/* <Rectangle bounds={[[17.447667994460527, 78.3487093448639], 
+          <Rectangle bounds={[[17.447667994460527, 78.3487093448639], 
           [17.447586140175613, 78.34859669208528]]} 
           pathOptions={{ color: 'brown' }} 
           eventHandlers={{ click: () => handleRectangleClick('Rectangle 1') }}
-          > */}
-
-          <Rectangle
-            bounds={[
-              [17.447667994460527, 78.3487093448639],
-              [17.447586140175613, 78.34859669208528]
-            ]}
-            pathOptions={{
-              color: 'brown',
-              fill: true, // Set fill to true
-              fillColor: 'brown' // Set the fill color
-            }}
-            eventHandlers={{ click: () => handleRectangleClick('Rectangle 1') }}
-          />
+          >
           {popupContent && <Popup>{popupContent}</Popup>}
-
+          </Rectangle>
           <Rectangle bounds={[[17.447023390971953, 78.34938526153566], 
           [17.446931304573262, 78.34950327873231]]} 
           pathOptions={{ color: 'orange' }}
@@ -471,21 +622,13 @@ function App() {
             onChange={(e) => setLongitudeInput(e.target.value)}
           />
         </div>
-        <div style={{ textAlign: 'center', marginTop: '20px' }}>
-        {/* <h2>Legend</h2> */}
-        <div>
-          <span style={{ display: 'inline-block', width: '20px', height: '20px',  backgroundColor: 'rgba(165, 42, 42, 0.5)', border: '3px solid brown' }}></span>
-          <span style={{ marginLeft: '5px' }}>Soil Tank</span>
-
-          <span style={{ display: 'inline-block', width: '20px', height: '20px', backgroundColor: 'rgba(255, 165, 0, 0.5)',  border: '3px solid orange'  }}></span>
-          <span style={{ marginLeft: '5px' }}>Salt Tank</span>
-        </div>
-        {/* Add more legends for other rectangles if needed */}
-      </div>
-        <button onClick={() => handleRemoveMarker(selectedMarkerIndex)}>Remove Marker</button>
+        
         <button onClick={addMarker}>Add Marker</button>
         <button onClick={clearMarkers}>Clear Markers</button>
-        <button onClick={logMarkerCoordinates}>Log Marker Coordinates</button>
+        <button onClick={addSaltMarker}>Add Salt Marker</button>
+        <button onClick={clearSaltMarkers}>Clear Salt Markers</button>
+        <button onClick={addSoilMarker}>Add Soil Marker</button>
+        <button onClick={clearSoilMarkers}>Clear Soil Markers</button>
 
         <table style={{ width: '100%' }}>
           <thead>
@@ -499,11 +642,35 @@ function App() {
           <tbody>
             {markers.map((marker, index) => (
               <tr key={index}>
-                <td>Marker {index + 1}</td>
+                <td>Water Marker {index + 1}</td>
                 <td>{marker.position[0].toFixed(6)}</td>
                 <td>{marker.position[1].toFixed(6)}</td>
                 <td>
                   <button onClick={() => handleRemoveMarker(index)}>
+                    Remove Marker
+                  </button>
+                </td>
+              </tr>
+            ))}
+            {saltmarkers.map((marker, index) => (
+              <tr key={index}>
+                <td>Salt Marker {index + 1}</td>
+                <td>{marker.position[0].toFixed(6)}</td>
+                <td>{marker.position[1].toFixed(6)}</td>
+                <td>
+                  <button onClick={() => handleRemoveSaltMarker(index)}>
+                    Remove Marker
+                  </button>
+                </td>
+              </tr>
+            ))}
+            {soilmarkers.map((marker, index) => (
+              <tr key={index}>
+                <td>Soil Marker {index + 1}</td>
+                <td>{marker.position[0].toFixed(6)}</td>
+                <td>{marker.position[1].toFixed(6)}</td>
+                <td>
+                  <button onClick={() => handleRemoveSoilMarker(index)}>
                     Remove Marker
                   </button>
                 </td>
