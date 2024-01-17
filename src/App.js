@@ -196,6 +196,27 @@ function App() {
     return { node: nearestNode, distance: distances[nearestNode] };
   };
 
+  //NEW VALUE OF VIRTUAL NODE
+  const postPercentDist = async (arrayToSend) => {
+    try {
+      const response = await axios.post('http://localhost:8080/percent', { array: arrayToSend });
+      console.log('Array sent to backend:', arrayToSend);
+    } catch (error) {
+      console.error('Error sending array to backend:', error);
+    }
+  };
+  
+
+  const getNewValue = async () => {
+    try {
+      const response = await axios.post('http://localhost:8080/nodeVal');
+      const data = response.data;
+      console.log("New Node Value = ", data)
+
+    } catch (error) {
+      console.error('Error fetching real-time data:', error);
+    }
+  };
 
   const handleMapClick = (e) => {
     console.log("handleMapClick Called ");
@@ -241,6 +262,9 @@ function App() {
       console.log('Percentage along the Line 1-2:', percentage1.toFixed(2), '%');
       console.log('Percentage along the Line 2-3:', percentage2.toFixed(2), '%');
       console.log('Percentage along the Line 3-1:', percentage3.toFixed(2), '%');
+
+      postPercentDist([percentage1, percentage2, percentage3]);
+      const nodeVal = getNewValue()
 
       // Proceed to add a marker
       const newMarker = {
