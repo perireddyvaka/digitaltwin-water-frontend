@@ -23,9 +23,27 @@ const n2 = [17.447779877527292, 78.34900975227357]
 const n3 = [17.447467486818034, 78.34940671920778]
 const n4 = [17.4471960649475, 78.3491760492325]
 const n5 = [17.44675052251036, 78.34972321987152]
-const n6 = [17.447016823868076, 78.34993779659273]
+const n6 = [17.446991217985186, 78.34991633892061]
 const n7 = [17.446622492872986, 78.3503830432892]
 const n8 = [17.446366433328517, 78.35017383098604]
+
+const new1 = [17.447549425416515, 78.34874153137208];
+const new2 = [17.447493092634005, 78.34880590438844];
+const new3 = [17.447810604453373, 78.34900975227357];
+const new4 = [17.447733787128456, 78.34902584552765];
+const new5 = [17.44745203101903, 78.34936916828156];
+const new6 = [17.447467486818034, 78.34944963455202];
+const new7 = [17.447221670801614, 78.34914922714235];
+const new8 = [17.447185822604858, 78.34920287132263];
+
+const New1 = [17.44675564369398, 78.34969103336336];
+const New2 = [17.446724916590068, 78.34975004196168];
+const New3 = [17.447021945044202, 78.34992170333864];
+const New4 = [17.446934885030213, 78.3499324321747];
+const New5 = [17.446607129310465, 78.3503293991089];
+const New6 = [17.446622492872986, 78.3504366874695];
+const New7 = [17.44639716049285, 78.35014164447786];
+const New8 = [17.44634082735428, 78.35021674633028];
 
 // Arranged in a order to Create Proper Rectangle 
 
@@ -163,6 +181,11 @@ function App() {
     const val3 = (y-y1) - slope3*(x-x1);
     const val4 = (y-y2) - slope4*(x-x2); 
 
+    console.log(val1);
+    console.log(val2);
+    console.log(val3);
+    console.log(val4);
+
     if(val1>0 && val2<0 && val3>0 && val4<0) 
     {
       return true;
@@ -190,7 +213,7 @@ function App() {
     const longitude = e.latlng.lng;
     setClickedLatLng({ latitude, longitude });
     console.log(latitude, longitude);
-  
+
     console.log(
       'Is point near rectangle:',
       isPointNearLine2([latitude, longitude], [newNode1,newNode3, newNode4, newNode6])
@@ -238,7 +261,80 @@ function App() {
       setMarkers((prevMarkers) => [...prevMarkers, newMarker]);
       setLatitudeInput('');
       setLongitudeInput('');
-    } else {
+    }
+    else if(isPointNearLine2([latitude, longitude], [new1,new2, new3, new4]))
+    {
+      console.log("Marker added");
+      const newMarker = {
+        position: [latitude, longitude],
+        flowrate: 0,
+        totalflow: 0,
+      };
+      setMarkers((prevMarkers) => [...prevMarkers, newMarker]);
+      setLatitudeInput('');
+      setLongitudeInput('');
+    } 
+    else if(isPointNearLine2([latitude, longitude], [new4 ,new5, new3, new6]))
+    {
+      console.log("Marker added");
+      const newMarker = {
+        position: [latitude, longitude],
+        flowrate: 0,
+        totalflow: 0,
+      };
+      setMarkers((prevMarkers) => [...prevMarkers, newMarker]);
+      setLatitudeInput('');
+      setLongitudeInput('');
+    } 
+    else if(isPointNearLine2([latitude, longitude], [new7 ,new8, new5, new6]))
+    {
+      console.log("Marker added");
+      const newMarker = {
+        position: [latitude, longitude],
+        flowrate: 0,
+        totalflow: 0,
+      };
+      setMarkers((prevMarkers) => [...prevMarkers, newMarker]);
+      setLatitudeInput('');
+      setLongitudeInput('');
+    }
+    else if(isPointNearLine2([latitude, longitude], [New1, New2, New3, New4]))
+    {
+      console.log("Marker added");
+      const newMarker = {
+        position: [latitude, longitude],
+        flowrate: 0,
+        totalflow: 0,
+      };
+      setMarkers((prevMarkers) => [...prevMarkers, newMarker]);
+      setLatitudeInput('');
+      setLongitudeInput('');
+    } 
+    else if(isPointNearLine2([latitude, longitude], [New4, New5, New3, New6]))
+    {
+      console.log("Marker added");
+      const newMarker = {
+        position: [latitude, longitude],
+        flowrate: 0,
+        totalflow: 0,
+      };
+      setMarkers((prevMarkers) => [...prevMarkers, newMarker]);
+      setLatitudeInput('');
+      setLongitudeInput('');
+    } 
+    else if(isPointNearLine2([latitude, longitude], [New7, New8, New5, New6]))
+    {
+      console.log("Marker added");
+      const newMarker = {
+        position: [latitude, longitude],
+        flowrate: 0,
+        totalflow: 0,
+      };
+      setMarkers((prevMarkers) => [...prevMarkers, newMarker]);
+      setLatitudeInput('');
+      setLongitudeInput('');
+    } 
+    else {
       // The clicked point is not inside the rectangle, show an alert
       console.log("Invalid Placement - Outside Rectangle");
       Swal.fire({
@@ -248,6 +344,8 @@ function App() {
         confirmButtonText: 'OK',
       });
     }
+
+    
   };
   
   
