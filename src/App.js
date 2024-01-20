@@ -584,15 +584,15 @@ function App() {
           <Polyline pathOptions={{ color: 'green', dashArray: '5' }} positions={[n1, n2, n3, n4]} />
           <Polyline pathOptions={{ color: 'green', dashArray: '5' }} positions={[n5, n6, n7, n8]} />
           {/* Add Rectangle components */}
-          <Rectangle bounds={[[17.447667994460527, 78.3487093448639], 
-          [17.447586140175613, 78.34859669208528]]} 
+          <Rectangle bounds={[[17.447590394701948, 78.34924042224885], 
+          [17.4476620909293, 78.34914386272432]]} 
           pathOptions={{ color: 'brown' }} 
           eventHandlers={{ click: () => handleRectangleClick('Rectangle 1') }}
           >
           {popupContent && <Popup>{popupContent}</Popup>}
           </Rectangle>
-          <Rectangle bounds={[[17.447023390971953, 78.34938526153566], 
-          [17.446931304573262, 78.34950327873231]]} 
+          <Rectangle bounds={[[17.446760764877457, 78.35020601749422], 
+          [17.44685294615552, 78.35008263587953]]} 
           pathOptions={{ color: 'orange' }}
           eventHandlers={{ click: () => handleRectangleClick('Rectangle 2') }}
           >
