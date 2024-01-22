@@ -271,9 +271,8 @@ function HomePage() {
           flowrate: 0,
           totalflow: 0,
         };
-        setMarkers((prevMarkers) => [...prevMarkers, newMarker]);
-        setLatitudeInput('');
-        setLongitudeInput('');
+        setLatitudeInput(latitude);
+        setLongitudeInput(longitude);
       } 
       else if(isPointNearLine2([latitude, longitude], [new4 ,new5, new3, new6]))
       {
@@ -283,9 +282,8 @@ function HomePage() {
           flowrate: 0,
           totalflow: 0,
         };
-        setMarkers((prevMarkers) => [...prevMarkers, newMarker]);
-        setLatitudeInput('');
-        setLongitudeInput('');
+        setLatitudeInput(latitude);
+        setLongitudeInput(longitude);
       } 
       else if(isPointNearLine2([latitude, longitude], [new7 ,new8, new5, new6]))
       {
@@ -295,9 +293,8 @@ function HomePage() {
           flowrate: 0,
           totalflow: 0,
         };
-        setMarkers((prevMarkers) => [...prevMarkers, newMarker]);
-        setLatitudeInput('');
-        setLongitudeInput('');
+        setLatitudeInput(latitude);
+        setLongitudeInput(longitude);
       }
       else if(isPointNearLine2([latitude, longitude], [New1, New2, New3, New4]))
       {
@@ -307,9 +304,8 @@ function HomePage() {
           flowrate: 0,
           totalflow: 0,
         };
-        setMarkers((prevMarkers) => [...prevMarkers, newMarker]);
-        setLatitudeInput('');
-        setLongitudeInput('');
+        setLatitudeInput(latitude);
+        setLongitudeInput(longitude);
       } 
       else if(isPointNearLine2([latitude, longitude], [New4, New5, New3, New6]))
       {
@@ -319,9 +315,8 @@ function HomePage() {
           flowrate: 0,
           totalflow: 0,
         };
-        setMarkers((prevMarkers) => [...prevMarkers, newMarker]);
-        setLatitudeInput('');
-        setLongitudeInput('');
+        setLatitudeInput(latitude);
+        setLongitudeInput(longitude);
       } 
       else if(isPointNearLine2([latitude, longitude], [New7, New8, New5, New6]))
       {
@@ -331,9 +326,8 @@ function HomePage() {
           flowrate: 0,
           totalflow: 0,
         };
-        setMarkers((prevMarkers) => [...prevMarkers, newMarker]);
-        setLatitudeInput('');
-        setLongitudeInput('');
+        setLatitudeInput(latitude);
+        setLongitudeInput(longitude);
       } 
       else {
         // The clicked point is not inside the rectangle, show an alert
@@ -786,7 +780,7 @@ function HomePage() {
           </table>
         </div>
         <Link to="/actuation">
-          <button>Go to Actuation Page</button>
+          <button style={{ display: 'block', margin: 'auto', marginTop: '10px', padding: '10px' }} >Go to Actuation Page</button>
         </Link>
       </div>
     );
