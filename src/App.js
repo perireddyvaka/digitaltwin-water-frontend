@@ -118,7 +118,7 @@ function App() {
   const actuationToBackend = async () => {
     try {
       const arrayToSend = [0, 1];
-      const response = await axios.post('http://localhost:8080/actuation', { array: arrayToSend });
+      const response = await axios.post('http://10.3.1.117:8080/actuation', { array: arrayToSend });
       console.log('Array sent to backend:', arrayToSend);
     } catch (error) {
       console.error('Error sending array to backend:', error);
@@ -199,7 +199,7 @@ function App() {
   //NEW VALUE OF VIRTUAL NODE
   const postPercentDist = async (arrayToSend) => {
     try {
-      const response = await axios.post('http://localhost:8080/percent', { array: arrayToSend });
+      const response = await axios.post('http://10.3.1.117:8080/percent', { array: arrayToSend });
       console.log('Array sent to backend:', arrayToSend);
     } catch (error) {
       console.error('Error sending array to backend:', error);
@@ -209,7 +209,7 @@ function App() {
 
   const getNewValue = async () => {
     try {
-      const response = await axios.post('http://localhost:8080/nodeVal');
+      const response = await axios.post('http://10.3.1.117:8080/nodeVal');
       const data = response.data;
       console.log("New Node Value = ", data)
 
@@ -386,7 +386,7 @@ function App() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.post('http://localhost:8080/real-time-location');
+        const response = await axios.post('http://10.3.1.117:8080/real-time-location');
         const data = response.data;
         console.log("real time loc = ", data)
         setRealTimeLocation(data);
@@ -407,7 +407,7 @@ function App() {
   useEffect(() => {
     const getAckFrontend = async () => {
       try {
-        const response = await axios.post('http://localhost:8080/acknowledgment');
+        const response = await axios.post('http://10.3.1.117:8080/acknowledgment');
         const data = response.data;
         console.log("ack = ", data)
 
@@ -502,7 +502,7 @@ function App() {
 
     const nodes = ["Node-1", "Node-2", "Node-3"];
     for (let i = 0; i < nodes.length; i++) {
-      let url = "http://localhost:8080/desc/" + nodes[i];
+      let url = "http://10.3.1.117:8080/desc/" + nodes[i];
       axios.get(url).then((response) => {
         data[nodes[i]] = response.data;
       });
