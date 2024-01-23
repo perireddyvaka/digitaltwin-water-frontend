@@ -6,6 +6,7 @@ import 'leaflet/dist/leaflet.css';
 import CustomCircleMarker from './components/CustomCircleMarker';
 import { IoIosWater } from 'react-icons/io';
 import { BsFillBoxFill } from "react-icons/bs";
+import { GiValve } from "react-icons/gi";
 import L from 'leaflet';
 import ReactDOMServer from 'react-dom/server';
 import Swal from 'sweetalert2';
@@ -26,27 +27,27 @@ const n2 = [17.447779877527292, 78.34900975227357]
 const n3 = [17.447467486818034, 78.34940671920778]
 const n4 = [17.4471960649475, 78.3491760492325]
 const n5 = [17.44675052251036, 78.34972321987152]
-const n6 = [17.446991217985186, 78.34991633892061]
+const n6 = [17.447016823868076, 78.34993779659273]
 const n7 = [17.446622492872986, 78.3503830432892]
 const n8 = [17.446366433328517, 78.35017383098604]
 
 const new1 = [17.447549425416515, 78.34874153137208];
 const new2 = [17.447493092634005, 78.34880590438844];
-const new3 = [17.447810604453373, 78.34900975227357];
+const new3 = [17.44782681109489, 78.34901511669159 ];
 const new4 = [17.447733787128456, 78.34902584552765];
-const new5 = [17.44745203101903, 78.34936916828156];
+const new5 = [17.447468822648837, 78.34934771060945];
 const new6 = [17.447467486818034, 78.34944963455202];
-const new7 = [17.447221670801614, 78.34914922714235];
-const new8 = [17.447185822604858, 78.34920287132263];
+const new7 = [17.447223342093153, 78.34914922714235];
+const new8 = [17.447167086085926, 78.34921360015869];
 
 const New1 = [17.44675564369398, 78.34969103336336];
 const New2 = [17.446724916590068, 78.34975004196168];
 const New3 = [17.447021945044202, 78.34992170333864];
 const New4 = [17.446934885030213, 78.3499324321747];
-const New5 = [17.446607129310465, 78.3503293991089];
-const New6 = [17.446622492872986, 78.3504366874695];
-const New7 = [17.44639716049285, 78.35014164447786];
-const New8 = [17.44634082735428, 78.35021674633028];
+const New5 = [17.44639716049285, 78.35012555122377];
+const New6 = [17.446325463768034, 78.35022211074829];
+const New7 = [17.446607129310465, 78.35031330585481];
+const New8 = [17.44662761406022, 78.35045814514162];
 
 
 const mapPosition = [17.44695, 78.34891];
@@ -128,7 +129,21 @@ function HomePage() {
     const [longitudeInput, setLongitudeInput] = useState('78.349047');
     const [selectedMarkerIndex, setSelectedMarkerIndex] = useState(null);
   
-    const [lastNodeCrossed, setLastNodeCrossed] = useState(null); 
+    const [lastNodeCrossed, setLastNodeCrossed] = useState(null);
+  const [realTimeLocation, setRealTimeLocation] = useState({
+    latitude: 0,
+    longitude: 0
+  });
+
+  const actuationToBackend = async () => {
+    try {
+      const arrayToSend = [0, 1];
+      const response = await axios.post('http://localhost:8080/actuation', { array: arrayToSend });
+      console.log('Array sent to backend:', arrayToSend);
+    } catch (error) {
+      console.error('Error sending array to backend:', error);
+    }
+  }; 
   
     const mapRef = useRef();
   
@@ -182,11 +197,6 @@ function HomePage() {
   
       const val3 = (y-y1) - slope3*(x-x1);
       const val4 = (y-y2) - slope4*(x-x2); 
-
-      console.log(val1);
-      console.log(val2);
-      console.log(val3);
-      console.log(val4);
   
       if(val1>0 && val2<0 && val3>0 && val4<0) 
       {
@@ -207,6 +217,29 @@ function HomePage() {
     
       return { node: nearestNode, distance: distances[nearestNode] };
     };
+
+    //NEW VALUE OF VIRTUAL NODE
+    const postPercentDist = async (arrayToSend) => {
+      try {
+        const response = await axios.post('http://localhost:8080/percent', { array: arrayToSend });
+        console.log('Array sent to backend:', arrayToSend);
+      } catch (error) {
+        console.error('Error sending array to backend:', error);
+      }
+    };
+
+
+    const getNewValue = async () => {
+      try {
+        const response = await axios.post('http://localhost:8080/nodeVal');
+        const data = response.data;
+        console.log("New Node Value = ", data)
+
+      } catch (error) {
+        console.error('Error fetching real-time data:', error);
+      }
+    };
+
     
   
     const handleMapClick = (e) => {
@@ -218,7 +251,7 @@ function HomePage() {
     
       console.log(
         'Is point near rectangle:',
-        isPointNearLine2([latitude, longitude], [newNode1, newNode3, newNode4, newNode6], 0.0001)
+        isPointNearLine2([latitude, longitude], [newNode1, newNode3, newNode4, newNode6])
       );
     
       // Check if the clicked point is inside the rectangle
@@ -253,6 +286,9 @@ function HomePage() {
         console.log('Percentage along the Line 1-2:', percentage1.toFixed(2), '%');
         console.log('Percentage along the Line 2-3:', percentage2.toFixed(2), '%');
         console.log('Percentage along the Line 3-1:', percentage3.toFixed(2), '%');
+
+        postPercentDist([percentage1, percentage2, percentage3]);
+        const nodeVal = getNewValue()
     
         // Proceed to add a marker
         const newMarker = {
@@ -382,58 +418,45 @@ function HomePage() {
     // };
   
     
-  //Rectangle Working Code 
-  //   const handleMapClick = (e) => {
-  //   console.log("handleMapClick Called ");
-  //   const latitude = e.latlng.lat;
-  //   const longitude = e.latlng.lng;
-  //   setClickedLatLng({ latitude, longitude });
-  //   console.log(latitude, longitude);
   
-  //   // Log if the point is near the rectangle
-  //   console.log(
-  //     'Is point near rectangle:',
-  //     isPointNearLine([latitude, longitude], [newNode1, newNode2, newNode3, newNode6, newNode5, newNode4], 0.0001)
-  //   );
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const response = await axios.post('http://localhost:8080/real-time-location');
+          const data = response.data;
+          console.log("real time loc = ", data)
+          setRealTimeLocation(data);
+          console.log("rtl = ", realTimeLocation);
+        } catch (error) {
+          console.error('Error fetching real-time data:', error);
+        }
+      };
+      const intervalId = setInterval(fetchData, 3000); // Adjust the interval based on your requirements
   
-  //   // Check if the clicked point is close enough to the rectangle
-  //   if (isPointNearLine([latitude, longitude], [newNode1, newNode2, newNode3, newNode6, newNode5, newNode4], 0.0001)) {
-  //     // The clicked point is inside the rectangle, proceed to add a marker
-  //     console.log("Marker added");
-  //     const newMarker = {
-  //       position: [latitude, longitude],
-  //       flowrate: 0,
-  //       totalflow: 0,
-  //     };
-  //     setMarkers([...markers, newMarker]);
-  //     setLatitudeInput('');
-  //     setLongitudeInput('');
-  //   } else {
-  //     // The clicked point is not inside the rectangle, show an alert
-  //     console.log("Invalid Placement");
-  //     Swal.fire({
-  //       title: 'Invalid Placement',
-  //       text: 'Please place the marker inside the rectangle.',
-  //       icon: 'error',
-  //       confirmButtonText: 'OK',
-  //     });
-  //   }
-  // };
+      return () => {
+        clearInterval(intervalId);
+      };
+    }, []);
   
-  // const isPointInsideRectangle = (point, rectangle) => {
-  //   const [x, y] = point;
-  //   const [x1, y1, x2, y2, x3, y3, x4, y4] = rectangle;
+    // ACKNOWLEDGMENT CODE
   
-  //   const isInside = (x, y, x1, y1, x2, y2, x3, y3) => {
-  //     const d1 = (x - x1) * (y2 - y1) - (y - y1) * (x2 - x1);
-  //     const d2 = (x - x2) * (y3 - y2) - (y - y2) * (x3 - x2);
-  //     const d3 = (x - x3) * (y4 - y3) - (y - y3) * (x4 - x3);
-  //     const d4 = (x - x4) * (y1 - y4) - (y - y4) * (x1 - x4);
-  //     return (d1 > 0 && d2 > 0 && d3 > 0 && d4 > 0) || (d1 < 0 && d2 < 0 && d3 < 0 && d4 < 0);
-  //   };
+    useEffect(() => {
+      const getAckFrontend = async () => {
+        try {
+          const response = await axios.post('http://localhost:8080/acknowledgment');
+          const data = response.data;
+          console.log("ack = ", data)
   
-  //   return isInside(x, y, x1, y1, x2, y2, x3, y3) || isInside(x, y, x1, y1, x4, y4, x3, y3);
-  // };
+        } catch (error) {
+          console.error('Error fetching real-time data:', error);
+        }
+      };
+      const intervalId = setInterval(getAckFrontend, 3000); // Adjust the interval based on your requirements
+  
+      return () => {
+        clearInterval(intervalId);
+      };
+    }, []);
   
     const logMarkerCoordinates = () => {
       markers.forEach((marker, index) => {
@@ -616,9 +639,37 @@ function HomePage() {
     const handleRectangleClick = (name) => {
       setPopupContent(`Clicked on ${name}`);
     };
-  
+
+    const [currentColor1, setCurrentColor1] = useState('red');
+    const [currentColor2, setCurrentColor2] = useState('red');
+    const [currentColor3, setCurrentColor3] = useState('red');
+    const [currentColor4, setCurrentColor4] = useState('red');
+    const [currentColor5, setCurrentColor5] = useState('red');
+    const [currentColor6, setCurrentColor6] = useState('red');
+
+    const handleSolonoidClick1 = () => {
+      setCurrentColor1((prevColor) => (prevColor === 'red' ? 'green' : 'red'));
+    }
+    const handleSolonoidClick2 = () => {
+      setCurrentColor2((prevColor) => (prevColor === 'red' ? 'green' : 'red'));
+    }
+    const handleSolonoidClick3 = () => {
+      setCurrentColor3((prevColor) => (prevColor === 'red' ? 'green' : 'red'));
+    }
+    const handleSolonoidClick4 = () => {
+      setCurrentColor4((prevColor) => (prevColor === 'red' ? 'green' : 'red'));
+    }
+    const handleSolonoidClick5 = () => {
+      setCurrentColor5((prevColor) => (prevColor === 'red' ? 'green' : 'red'));
+    }
+    const handleSolonoidClick6 = () => {
+      setCurrentColor6((prevColor) => (prevColor === 'red' ? 'green' : 'red'));
+    }
+    
     return (
       <div>
+        {/* TEMPORARY BUTTON UNTIL ACTUATION FRONTEND GETS BUILT */}
+        <button onClick={actuationToBackend}>Send Array to Backend</button>
         <h1 style={{ textAlign: 'center' }}>Digital Twin Water Simulation</h1>
         <div className="main" id="map" style={{ width: '100%', textAlign: 'center' }}>
           <MapContainer
@@ -687,21 +738,102 @@ function HomePage() {
             <Polyline pathOptions={{ color: 'green', dashArray: '5' }} positions={[dt_node_1, dt_node_2, dt_node_3]} />
             <Polyline pathOptions={{ color: 'green', dashArray: '5' }} positions={[n1, n2, n3, n4]} />
             <Polyline pathOptions={{ color: 'green', dashArray: '5' }} positions={[n5, n6, n7, n8]} />
-            {/* Add Rectangle components */}
-            <Rectangle bounds={[[17.447590394701948, 78.34924042224885], 
-          [17.4476620909293, 78.34914386272432]]}  
-            pathOptions={{ color: 'brown' }} 
-            eventHandlers={{ click: () => handleRectangleClick('Rectangle 1') }}
+            <Marker
+              position={[17.44763648513704, 78.3491760492325]}
+              icon={
+                new L.divIcon({
+                  className: 'custom-icon',
+                  html: ReactDOMServer.renderToString(<BsFillBoxFill size={30} color="Brown" />),
+                  iconSize: [30, 30],
+                })
+              }
+              eventHandlers={{ click: () => handleSolonoidClick1() }}
             >
-            {popupContent && <Popup>{popupContent}</Popup>}
-            </Rectangle>
-            <Rectangle bounds={[[17.446760764877457, 78.35020601749422], 
-          [17.44685294615552, 78.35008263587953]]}  
-            pathOptions={{ color: 'orange' }}
-            eventHandlers={{ click: () => handleRectangleClick('Rectangle 2') }}
+            </Marker>
+            <Marker
+              position={[17.446817097886246, 78.35015237331392]}
+              icon={
+                new L.divIcon({
+                  className: 'custom-icon',
+                  html: ReactDOMServer.renderToString(<BsFillBoxFill size={30} color="orange" />),
+                  iconSize: [30, 30],
+                })
+              }
+              eventHandlers={{ click: () => handleSolonoidClick1() }}
             >
-            {popupContent && <Popup>{popupContent}</Popup>}
-            </Rectangle>
+            </Marker>
+           <Marker
+              position={[17.447380427016785, 78.34895610809328]}
+              icon={
+                new L.divIcon({
+                  className: 'custom-icon',
+                  html: ReactDOMServer.renderToString(<GiValve size={30} color={currentColor1} />),
+                  iconSize: [30, 30],
+                })
+              }
+              eventHandlers={{ click: () => handleSolonoidClick1() }}
+            >
+            </Marker>
+            <Marker
+              position={[17.44763648513704,78.34888637065889]}
+              icon={
+                new L.divIcon({
+                  className: 'custom-icon',
+                  html: ReactDOMServer.renderToString(<GiValve size={30} color={currentColor2} />),
+                  iconSize: [30, 30],
+                })
+              }
+              eventHandlers={{ click: () => handleSolonoidClick2() }}
+            >
+            </Marker>
+            <Marker
+              position={[17.44731897301441,78.34929406642915]}
+              icon={
+                new L.divIcon({
+                  className: 'custom-icon',
+                  html: ReactDOMServer.renderToString(<GiValve size={30} color={currentColor3} />),
+                  iconSize: [30, 30],
+                })
+              }
+              eventHandlers={{ click: () => handleSolonoidClick3() }}
+            >
+            </Marker>
+            <Marker
+              position={[17.44655079623678, 78.34996461868288]}
+              icon={
+                new L.divIcon({
+                  className: 'custom-icon',
+                  html: ReactDOMServer.renderToString(<GiValve size={30} color={currentColor4} />),
+                  iconSize: [30, 30],
+                })
+              }
+              eventHandlers={{ click: () => handleSolonoidClick4() }}
+            >
+            </Marker>
+            <Marker
+              position={[17.44688879441771, 78.34984123706819]}
+              icon={
+                new L.divIcon({
+                  className: 'custom-icon',
+                  html: ReactDOMServer.renderToString(<GiValve size={30} color={currentColor5} />),
+                  iconSize: [30, 30],
+                })
+              }
+              eventHandlers={{ click: () => handleSolonoidClick5() }}
+            >
+            </Marker>
+            <Marker
+              position={[17.446484220763637, 78.35026502609253]}
+              icon={
+                new L.divIcon({
+                  className: 'custom-icon',
+                  html: ReactDOMServer.renderToString(<GiValve size={30} color={currentColor6} />),
+                  iconSize: [30, 30],
+                })
+              }
+              eventHandlers={{ click: () => handleSolonoidClick6() }}
+            >
+            </Marker>
           </MapContainer>
         </div>
         <div style={{ textAlign: 'center', marginTop: '20px' }}>
