@@ -597,6 +597,22 @@ function App() {
     }
   };
 
+  const comparePos = (newMarker) => {
+    const newlat = newMarker.position[0].toFixed(3);
+    const newlong = newMarker.position[1].toFixed(3);
+  
+    
+    const saltMarkersBefore = saltmarkers.filter(
+      (saltMarker) =>(
+          console.log(saltMarker.position[0].toFixed(3)) <= console.log(newMarker.position[0].toFixed(3)) ||
+        (saltMarker.position[0].toFixed(2) === newMarker.position[0].toFixed(2) &&
+          saltMarker.position[1].toFixed(3) <= newMarker.position[1].toFixed(3))) && saltMarker.inbtwNode == newMarker.inbtwNode
+    );
+  
+    console.log(saltMarkersBefore);
+    return saltMarkersBefore;
+  };
+  
   const addMarker = () => {
     if (latitudeInput && longitudeInput) {
       const newMarker = {
@@ -605,13 +621,111 @@ function App() {
         u_tds: 0,
         total_flow: 0,
         v_tds: 0,
+        inbtwNode: -1,
       };
+
+      const newlat = newMarker.position[0]
+      const newlong = newMarker.position[1]
+
+      // Get the distances to neighboring nodes
+      const distanceToNode1 = mapRef.current.distance([newlat, newlong], dt_node_1);
+      const distanceToNode2 = mapRef.current.distance([newlat, newlong], dt_node_2);
+      const distanceToNode3 = mapRef.current.distance([newlat, newlong], dt_node_3);
+
+      // Calculate the total distance between neighboring nodes
+      const totalDistance1 = mapRef.current.distance(dt_node_1,dt_node_2);
+      const totalDistance2 = mapRef.current.distance(dt_node_2, dt_node_3);
+      const totalDistance3 = mapRef.current.distance(dt_node_3, dt_node_1);
+  
+      // Calculate the percentages along the line segment
+      const percentage1 = (distanceToNode1 / totalDistance1) * 100;
+      let percentage2 = (distanceToNode2 / totalDistance2) * 100;
+      const percentage3 = (distanceToNode3 / totalDistance3) * 100;
+
+      if (percentage1 < 100) {
+        percentage2 = percentage2 - 100;
+      }
+
+      if(percentage1 <= 100)
+      {
+        newMarker.inbtwNode = 0;
+      }
+      else
+      {
+        newMarker.inbtwNode = 1;
+      }
+
+      console.log(saltmarkers)
+      const saltMarkersBefore = comparePos(newMarker)
       setMarkers([...markers, newMarker]);
+      setLatitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
+      setLongitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
+      console.log('Number of Salt Markers placed before the new marker:', saltMarkersBefore.length);
+    }
+  };
+
+
+  const addSaltMarker = () => {
+    if (latitudeInput && longitudeInput) {
+      const newMarker = {
+        position: [parseFloat(latitudeInput), parseFloat(longitudeInput)],
+        temparature: 0,
+        u_tds: 0,
+        total_flow: 0,
+        v_tds: 0,
+      };
+
+      const newlat = newMarker.position[0]
+      const newlong = newMarker.position[1]
+
+      // Get the distances to neighboring nodes
+      const distanceToNode1 = mapRef.current.distance([newlat, newlong], dt_node_1);
+      const distanceToNode2 = mapRef.current.distance([newlat, newlong], dt_node_2);
+      const distanceToNode3 = mapRef.current.distance([newlat, newlong], dt_node_3);
+
+      // Calculate the total distance between neighboring nodes
+      const totalDistance1 = mapRef.current.distance(dt_node_1,dt_node_2);
+      const totalDistance2 = mapRef.current.distance(dt_node_2, dt_node_3);
+      const totalDistance3 = mapRef.current.distance(dt_node_3, dt_node_1);
+  
+      // Calculate the percentages along the line segment
+      const percentage1 = (distanceToNode1 / totalDistance1) * 100;
+      let percentage2 = (distanceToNode2 / totalDistance2) * 100;
+      const percentage3 = (distanceToNode3 / totalDistance3) * 100;
+
+      if (percentage1 < 100) {
+        percentage2 = percentage2 - 100;
+      }
+
+      if(percentage1 <= 100)
+      {
+        newMarker.inbtwNode = 0;
+      }
+      else
+      {
+        newMarker.inbtwNode = 1;
+      }
+
+      setSaltMarkers([...saltmarkers, newMarker]);
       setLatitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
       setLongitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
     }
   };
 
+  const addSoilMarker = () => {
+    if (latitudeInput && longitudeInput) {
+      const newMarker = {
+        position: [parseFloat(latitudeInput), parseFloat(longitudeInput)],
+        temparature: 0,
+        u_tds: 0,
+        total_flow: 0,
+        v_tds: 0,
+      };
+      setSoilMarkers([...soilmarkers, newMarker]);
+      setLatitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
+      setLongitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
+    }
+  };
 
   const addSaltMarker = () => {
     if (latitudeInput && longitudeInput) {
