@@ -251,6 +251,7 @@ function App() {
 
     console.log(
       'Is point near rectangle:',
+
       isPointNearLine2([latitude, longitude], [newNode1, newNode3, newNode4, newNode6])
 
     );
@@ -301,6 +302,7 @@ function App() {
       };
       setLatitudeInput(latitude);
       setLongitudeInput(longitude);
+
     }else if(isPointNearLine2([latitude, longitude], [new1,new2, new3, new4]))
     {
       console.log("Marker added");
@@ -428,7 +430,6 @@ function App() {
   //   const longitude = e.latlng.lng;
   //   setClickedLatLng({ latitude, longitude });
   //   console.log(latitude, longitude);
-
   //   // Log if the point is near the rectangle
   //   console.log(
   //     'Is point near rectangle:',
@@ -473,6 +474,7 @@ function App() {
 
   //   return isInside(x, y, x1, y1, x2, y2, x3, y3) || isInside(x, y, x1, y1, x4, y4, x3, y3);
   // };
+
 
 
   useEffect(() => {
@@ -611,7 +613,6 @@ function App() {
     return saltMarkersBefore;
   };
   
-
   const addMarker = () => {
     if (latitudeInput && longitudeInput) {
       const newMarker = {
@@ -705,6 +706,36 @@ function App() {
         newMarker.inbtwNode = 1;
       }
 
+      setSaltMarkers([...saltmarkers, newMarker]);
+      setLatitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
+      setLongitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
+    }
+  };
+
+  const addSoilMarker = () => {
+    if (latitudeInput && longitudeInput) {
+      const newMarker = {
+        position: [parseFloat(latitudeInput), parseFloat(longitudeInput)],
+        temparature: 0,
+        u_tds: 0,
+        total_flow: 0,
+        v_tds: 0,
+      };
+      setSoilMarkers([...soilmarkers, newMarker]);
+      setLatitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
+      setLongitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
+    }
+  };
+
+  const addSaltMarker = () => {
+    if (latitudeInput && longitudeInput) {
+      const newMarker = {
+        position: [parseFloat(latitudeInput), parseFloat(longitudeInput)],
+        temparature: 0,
+        u_tds: 0,
+        total_flow: 0,
+        v_tds: 0,
+      };
       setSaltMarkers([...saltmarkers, newMarker]);
       setLatitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
       setLongitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
@@ -878,6 +909,7 @@ function App() {
           <Polyline pathOptions={{ color: 'green', dashArray: '5' }} positions={[dt_node_1, dt_node_2, dt_node_3]} />
           <Polyline pathOptions={{ color: 'green', dashArray: '5' }} positions={[n1, n2, n3, n4]} />
           <Polyline pathOptions={{ color: 'green', dashArray: '5' }} positions={[n5, n6, n7, n8]} />
+
           <Marker
               position={[17.44763648513704, 78.3491760492325]}
               icon={
@@ -974,6 +1006,7 @@ function App() {
               eventHandlers={{ click: () => handleSolonoidClick6() }}
             >
             </Marker>
+
         </MapContainer>
       </div>
       <div style={{ textAlign: 'center', marginTop: '20px' }}>
