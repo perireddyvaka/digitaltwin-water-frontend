@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css';
 import CustomCircleMarker from './components/CustomCircleMarker';
 import { IoIosWater } from 'react-icons/io';
 import { BsFillBoxFill } from "react-icons/bs";
+import { GiValve } from "react-icons/gi";
 import L from 'leaflet';
 import ReactDOMServer from 'react-dom/server';
 import Swal from 'sweetalert2';
@@ -27,6 +28,24 @@ const n5 = [17.44675052251036, 78.34972321987152]
 const n6 = [17.447016823868076, 78.34993779659273]
 const n7 = [17.446622492872986, 78.3503830432892]
 const n8 = [17.446366433328517, 78.35017383098604]
+
+const new1 = [17.447549425416515, 78.34874153137208];
+const new2 = [17.447493092634005, 78.34880590438844];
+const new3 = [17.44782681109489, 78.34901511669159 ];
+const new4 = [17.447733787128456, 78.34902584552765];
+const new5 = [17.447468822648837, 78.34934771060945];
+const new6 = [17.447467486818034, 78.34944963455202];
+const new7 = [17.447223342093153, 78.34914922714235];
+const new8 = [17.447167086085926, 78.34921360015869];
+
+const New1 = [17.44675564369398, 78.34969103336336];
+const New2 = [17.446724916590068, 78.34975004196168];
+const New3 = [17.447021945044202, 78.34992170333864];
+const New4 = [17.446934885030213, 78.3499324321747];
+const New5 = [17.44639716049285, 78.35012555122377];
+const New6 = [17.446325463768034, 78.35022211074829];
+const New7 = [17.446607129310465, 78.35031330585481];
+const New8 = [17.44662761406022, 78.35045814514162];
 
 // Arranged in a order to Create Proper Rectangle 
 
@@ -232,7 +251,8 @@ function App() {
 
     console.log(
       'Is point near rectangle:',
-      isPointNearLine2([latitude, longitude], [newNode1, newNode3, newNode4, newNode6], 0.0001)
+
+      isPointNearLine2([latitude, longitude], [newNode1, newNode3, newNode4, newNode6])
 
     );
 
@@ -282,7 +302,74 @@ function App() {
       };
       setLatitudeInput(latitude);
       setLongitudeInput(longitude);
-    } else {
+
+    }else if(isPointNearLine2([latitude, longitude], [new1,new2, new3, new4]))
+    {
+      console.log("Marker added");
+      const newMarker = {
+        position: [latitude, longitude],
+        flowrate: 0,
+        totalflow: 0,
+      };
+      setLatitudeInput(latitude);
+      setLongitudeInput(longitude);
+    } 
+    else if(isPointNearLine2([latitude, longitude], [new4 ,new5, new3, new6]))
+    {
+      console.log("Marker added");
+      const newMarker = {
+        position: [latitude, longitude],
+        flowrate: 0,
+        totalflow: 0,
+      };
+      setLatitudeInput(latitude);
+      setLongitudeInput(longitude);
+    } 
+    else if(isPointNearLine2([latitude, longitude], [new7 ,new8, new5, new6]))
+    {
+      console.log("Marker added");
+      const newMarker = {
+        position: [latitude, longitude],
+        flowrate: 0,
+        totalflow: 0,
+      };
+      setLatitudeInput(latitude);
+      setLongitudeInput(longitude);
+    }
+    else if(isPointNearLine2([latitude, longitude], [New1, New2, New3, New4]))
+    {
+      console.log("Marker added");
+      const newMarker = {
+        position: [latitude, longitude],
+        flowrate: 0,
+        totalflow: 0,
+      };
+      setLatitudeInput(latitude);
+      setLongitudeInput(longitude);
+    } 
+    else if(isPointNearLine2([latitude, longitude], [New4, New5, New3, New6]))
+    {
+      console.log("Marker added");
+      const newMarker = {
+        position: [latitude, longitude],
+        flowrate: 0,
+        totalflow: 0,
+      };
+      setLatitudeInput(latitude);
+      setLongitudeInput(longitude);
+    } 
+    else if(isPointNearLine2([latitude, longitude], [New7, New8, New5, New6]))
+    {
+      console.log("Marker added");
+      const newMarker = {
+        position: [latitude, longitude],
+        flowrate: 0,
+        totalflow: 0,
+      };
+      setLatitudeInput(latitude);
+      setLongitudeInput(longitude);
+    } 
+    else {
       // The clicked point is not inside the rectangle, show an alert
       console.log("Invalid Placement - Outside Rectangle");
       Swal.fire({
@@ -343,7 +430,6 @@ function App() {
   //   const longitude = e.latlng.lng;
   //   setClickedLatLng({ latitude, longitude });
   //   console.log(latitude, longitude);
-
   //   // Log if the point is near the rectangle
   //   console.log(
   //     'Is point near rectangle:',
@@ -388,6 +474,7 @@ function App() {
 
   //   return isInside(x, y, x1, y1, x2, y2, x3, y3) || isInside(x, y, x1, y1, x4, y4, x3, y3);
   // };
+
 
 
   useEffect(() => {
@@ -610,6 +697,31 @@ function App() {
   const handleRectangleClick = (name) => {
     setPopupContent(`Clicked on ${name}`);
   };
+  const [currentColor1, setCurrentColor1] = useState('red');
+  const [currentColor2, setCurrentColor2] = useState('red');
+  const [currentColor3, setCurrentColor3] = useState('red');
+  const [currentColor4, setCurrentColor4] = useState('red');
+  const [currentColor5, setCurrentColor5] = useState('red');
+  const [currentColor6, setCurrentColor6] = useState('red');
+
+  const handleSolonoidClick1 = () => {
+    setCurrentColor1((prevColor) => (prevColor === 'red' ? 'green' : 'red'));
+  }
+  const handleSolonoidClick2 = () => {
+    setCurrentColor2((prevColor) => (prevColor === 'red' ? 'green' : 'red'));
+  }
+  const handleSolonoidClick3 = () => {
+    setCurrentColor3((prevColor) => (prevColor === 'red' ? 'green' : 'red'));
+  }
+  const handleSolonoidClick4 = () => {
+    setCurrentColor4((prevColor) => (prevColor === 'red' ? 'green' : 'red'));
+  }
+  const handleSolonoidClick5 = () => {
+    setCurrentColor5((prevColor) => (prevColor === 'red' ? 'green' : 'red'));
+  }
+  const handleSolonoidClick6 = () => {
+    setCurrentColor6((prevColor) => (prevColor === 'red' ? 'green' : 'red'));
+  }
 
   return (
     <div>
@@ -683,28 +795,104 @@ function App() {
           <Polyline pathOptions={{ color: 'green', dashArray: '5' }} positions={[dt_node_1, dt_node_2, dt_node_3]} />
           <Polyline pathOptions={{ color: 'green', dashArray: '5' }} positions={[n1, n2, n3, n4]} />
           <Polyline pathOptions={{ color: 'green', dashArray: '5' }} positions={[n5, n6, n7, n8]} />
-          {/* Add Rectangle components */}
-          <Rectangle bounds={[[17.447667994460527, 78.3487093448639],
-          [17.447586140175613, 78.34859669208528]]} 
-          pathOptions={{ color: 'brown' }} 
-          eventHandlers={{ click: () => handleRectangleClick('Rectangle 1') }}
-          >
-          {popupContent && <Popup>{popupContent}</Popup>}
-          </Rectangle>
-          <Rectangle bounds={[[17.447023390971953, 78.34938526153566], 
-          [17.446931304573262, 78.34950327873231]]} 
-          pathOptions={{ color: 'orange' }}
-          eventHandlers={{ click: () => handleRectangleClick('Rectangle 2') }}
-          >
-            {popupContent && <Popup>{popupContent}</Popup>}
-          </Rectangle>
-          <Rectangle bounds={[[17.447023390971953, 78.34938526153566],
-          [17.446931304573262, 78.34950327873231]]}
-            pathOptions={{ color: 'orange' }}
-            eventHandlers={{ click: () => handleRectangleClick('Rectangle 2') }}
-          >
-            {popupContent && <Popup>{popupContent}</Popup>}
-          </Rectangle>
+
+          <Marker
+              position={[17.44763648513704, 78.3491760492325]}
+              icon={
+                new L.divIcon({
+                  className: 'custom-icon',
+                  html: ReactDOMServer.renderToString(<BsFillBoxFill size={30} color="Brown" />),
+                  iconSize: [30, 30],
+                })
+              }
+              eventHandlers={{ click: () => handleSolonoidClick1() }}
+            >
+            </Marker>
+            <Marker
+              position={[17.446817097886246, 78.35015237331392]}
+              icon={
+                new L.divIcon({
+                  className: 'custom-icon',
+                  html: ReactDOMServer.renderToString(<BsFillBoxFill size={30} color="orange" />),
+                  iconSize: [30, 30],
+                })
+              }
+              eventHandlers={{ click: () => handleSolonoidClick1() }}
+            >
+            </Marker>
+           <Marker
+              position={[17.447380427016785, 78.34895610809328]}
+              icon={
+                new L.divIcon({
+                  className: 'custom-icon',
+                  html: ReactDOMServer.renderToString(<GiValve size={30} color={currentColor1} />),
+                  iconSize: [30, 30],
+                })
+              }
+              eventHandlers={{ click: () => handleSolonoidClick1() }}
+            >
+            </Marker>
+            <Marker
+              position={[17.44763648513704,78.34888637065889]}
+              icon={
+                new L.divIcon({
+                  className: 'custom-icon',
+                  html: ReactDOMServer.renderToString(<GiValve size={30} color={currentColor2} />),
+                  iconSize: [30, 30],
+                })
+              }
+              eventHandlers={{ click: () => handleSolonoidClick2() }}
+            >
+            </Marker>
+            <Marker
+              position={[17.44731897301441,78.34929406642915]}
+              icon={
+                new L.divIcon({
+                  className: 'custom-icon',
+                  html: ReactDOMServer.renderToString(<GiValve size={30} color={currentColor3} />),
+                  iconSize: [30, 30],
+                })
+              }
+              eventHandlers={{ click: () => handleSolonoidClick3() }}
+            >
+            </Marker>
+            <Marker
+              position={[17.44655079623678, 78.34996461868288]}
+              icon={
+                new L.divIcon({
+                  className: 'custom-icon',
+                  html: ReactDOMServer.renderToString(<GiValve size={30} color={currentColor4} />),
+                  iconSize: [30, 30],
+                })
+              }
+              eventHandlers={{ click: () => handleSolonoidClick4() }}
+            >
+            </Marker>
+            <Marker
+              position={[17.44688879441771, 78.34984123706819]}
+              icon={
+                new L.divIcon({
+                  className: 'custom-icon',
+                  html: ReactDOMServer.renderToString(<GiValve size={30} color={currentColor5} />),
+                  iconSize: [30, 30],
+                })
+              }
+              eventHandlers={{ click: () => handleSolonoidClick5() }}
+            >
+            </Marker>
+            <Marker
+              position={[17.446484220763637, 78.35026502609253]}
+              icon={
+                new L.divIcon({
+                  className: 'custom-icon',
+                  html: ReactDOMServer.renderToString(<GiValve size={30} color={currentColor6} />),
+                  iconSize: [30, 30],
+                })
+              }
+              eventHandlers={{ click: () => handleSolonoidClick6() }}
+            >
+            </Marker>
+
         </MapContainer>
       </div>
       <div style={{ textAlign: 'center', marginTop: '20px' }}>
