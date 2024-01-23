@@ -1,6 +1,6 @@
 // ActuationPage.js
 import React, { useState } from 'react';
-import circuit from './circuit.jpg';
+import circuit from './circuit.png';
 import { Link } from 'react-router-dom';
 import { GiValve } from "react-icons/gi";
 import { FaBoxArchive } from "react-icons/fa6";
