@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 // import { BrowserRouter as Router, Route } from 'react-router-dom';
-import ActuationPage from './ActuationPage';
-import HomePage from './HomePage';
+import ActuationPage from './pages/ActuationPage';
+import HomePage from './pages/HomePage';
 // import { MapContainer, TileLayer, Polyline, Marker, Popup, Polygon, Rectangle } from 'react-leaflet';
 // import 'leaflet/dist/leaflet.css';
 // import CustomCircleMarker from './components/CustomCircleMarker';
