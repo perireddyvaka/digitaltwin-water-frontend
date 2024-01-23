@@ -712,35 +712,21 @@ function App() {
     }
   };
 
-  const addSoilMarker = () => {
-    if (latitudeInput && longitudeInput) {
-      const newMarker = {
-        position: [parseFloat(latitudeInput), parseFloat(longitudeInput)],
-        temparature: 0,
-        u_tds: 0,
-        total_flow: 0,
-        v_tds: 0,
-      };
-      setSoilMarkers([...soilmarkers, newMarker]);
-      setLatitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
-      setLongitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
-    }
-  };
 
-  const addSaltMarker = () => {
-    if (latitudeInput && longitudeInput) {
-      const newMarker = {
-        position: [parseFloat(latitudeInput), parseFloat(longitudeInput)],
-        temparature: 0,
-        u_tds: 0,
-        total_flow: 0,
-        v_tds: 0,
-      };
-      setSaltMarkers([...saltmarkers, newMarker]);
-      setLatitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
-      setLongitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
-    }
-  };
+  // const addSaltMarker = () => {
+  //   if (latitudeInput && longitudeInput) {
+  //     const newMarker = {
+  //       position: [parseFloat(latitudeInput), parseFloat(longitudeInput)],
+  //       temparature: 0,
+  //       u_tds: 0,
+  //       total_flow: 0,
+  //       v_tds: 0,
+  //     };
+  //     setSaltMarkers([...saltmarkers, newMarker]);
+  //     setLatitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
+  //     setLongitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
+  //   }
+  // };
 
   const addSoilMarker = () => {
     if (latitudeInput && longitudeInput) {
