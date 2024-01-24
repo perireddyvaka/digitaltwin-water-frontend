@@ -43,7 +43,7 @@ function CustomCircleMarker({ nodeData, setClickedNode }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.post('http://localhost:8080/real-time-location');
+        const response = await axios.post('http://10.3.1.117:8080/real-time-location');
         const data = response.data;
         console.log("real time loc = ", data)
         setLatitude(data.latitude);
