@@ -100,7 +100,7 @@ function ActuationPage() {
               <td>Solenoid Valve Turned Off</td>
             </tr>
             <tr>
-              <td><MdOutlineInbox size={30} color="red" /></td>
+              <td><MdOutlineInbox size={30} color="black" /></td>
               <td>Water Quality Node</td>
             </tr>
             
