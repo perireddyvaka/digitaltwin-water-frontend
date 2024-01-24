@@ -11,7 +11,13 @@ import L from 'leaflet';
 import ReactDOMServer from 'react-dom/server';
 import Swal from 'sweetalert2';
 import axios from 'axios';
+
+import NavigationBar from '../components/Navigation/Navigation';
+
 import '../App.css';
+
+
+
 
 const dt_node_1 = [17.44773337470836, 78.34853368169597];
 const dt_node_2 = [17.44711288989055, 78.34927584903512];
@@ -679,6 +685,7 @@ function HomePage() {
       <div>
         {/* TEMPORARY BUTTON UNTIL ACTUATION FRONTEND GETS BUILT */}
         {/* <button onClick={actuationToBackend}>Send Array to Backend</button> */}
+        <NavigationBar/>
         <h1 style={{ textAlign: 'center' }}>Digital Twin Water Simulation</h1>
         <div className="main" id="map" style={{ width: '100%', textAlign: 'center' }}>
           <MapContainer
