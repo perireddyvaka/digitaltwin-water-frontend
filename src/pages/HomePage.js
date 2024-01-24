@@ -130,10 +130,12 @@ function HomePage() {
     const [selectedMarkerIndex, setSelectedMarkerIndex] = useState(null);
   
     const [lastNodeCrossed, setLastNodeCrossed] = useState(null);
+    const [nodeVal, setnodeVal] = useState(null)
   const [realTimeLocation, setRealTimeLocation] = useState({
     latitude: 0,
     longitude: 0
   });
+
 
   const actuationToBackend = async () => {
     try {
@@ -232,8 +234,10 @@ function HomePage() {
     const getNewValue = async () => {
       try {
         const response = await axios.post('http://localhost:8080/nodeVal');
-        const data = response.data;
+        const data = response.data['nodeVal'];
         console.log("New Node Value = ", data)
+        setnodeVal(data)
+        return data;
 
       } catch (error) {
         console.error('Error fetching real-time data:', error);
@@ -288,7 +292,10 @@ function HomePage() {
         console.log('Percentage along the Line 3-1:', percentage3.toFixed(2), '%');
 
         postPercentDist([percentage1, percentage2, percentage3]);
-        const nodeVal = getNewValue()
+        const nodeValue = getNewValue()
+        // console.log("Original Value",nodeValue)
+        // setnodeVal(nodeValue)
+        // console.log("Calculated Val",nodeVal)
     
         // Proceed to add a marker
         const newMarker = {
@@ -474,6 +481,8 @@ function HomePage() {
             Latitude: {clickedLatLng.latitude}
             <br />
             Longitude: {clickedLatLng.longitude}
+            <br />
+            Calculated TDS Value: {nodeVal}
           </div>
         );
       } else {
