@@ -478,9 +478,9 @@ function HomePage() {
           <div>
             {`Marker ${index + 1} - Clicked Coordinates:`}
             <br />
-            Latitude: {clickedLatLng.latitude}
+            Latitude: {marker.position[0].toFixed(6)}
             <br />
-            Longitude: {clickedLatLng.longitude}
+            Longitude: {marker.position[1].toFixed(6)}
             <br />
             Calculated TDS Value: {nodeVal}
           </div>
@@ -505,9 +505,9 @@ function HomePage() {
           <div>
             {`Marker ${index + 1} - Clicked Coordinates:`}
             <br />
-            Latitude: {clickedLatLng.latitude}
+            Latitude: {marker.position[0].toFixed(6)}
             <br />
-            Longitude: {clickedLatLng.longitude}
+            Longitude: {marker.position[1].toFixed(6)}
           </div>
         );
       } else {
@@ -530,9 +530,9 @@ function HomePage() {
           <div>
             {`Marker ${index + 1} - Clicked Coordinates:`}
             <br />
-            Latitude: {clickedLatLng.latitude}
+            Latitude: {marker.position[0].toFixed(6)}
             <br />
-            Longitude: {clickedLatLng.longitude}
+            Longitude: {marker.position[1].toFixed(6)}
           </div>
         );
       } else {
@@ -649,12 +649,10 @@ function HomePage() {
       setPopupContent(`Clicked on ${name}`);
     };
 
-    const [currentColor1, setCurrentColor1] = useState('red');
+    const [currentColor1, setCurrentColor1] = useState('green');
     const [currentColor2, setCurrentColor2] = useState('red');
-    const [currentColor3, setCurrentColor3] = useState('red');
-    const [currentColor4, setCurrentColor4] = useState('red');
+    const [currentColor4, setCurrentColor4] = useState('green');
     const [currentColor5, setCurrentColor5] = useState('red');
-    const [currentColor6, setCurrentColor6] = useState('red');
 
     const handleSolonoidClick1 = () => {
       setCurrentColor1((prevColor) => (prevColor === 'red' ? 'green' : 'red'));
@@ -662,17 +660,11 @@ function HomePage() {
     const handleSolonoidClick2 = () => {
       setCurrentColor2((prevColor) => (prevColor === 'red' ? 'green' : 'red'));
     }
-    const handleSolonoidClick3 = () => {
-      setCurrentColor3((prevColor) => (prevColor === 'red' ? 'green' : 'red'));
-    }
     const handleSolonoidClick4 = () => {
       setCurrentColor4((prevColor) => (prevColor === 'red' ? 'green' : 'red'));
     }
     const handleSolonoidClick5 = () => {
       setCurrentColor5((prevColor) => (prevColor === 'red' ? 'green' : 'red'));
-    }
-    const handleSolonoidClick6 = () => {
-      setCurrentColor6((prevColor) => (prevColor === 'red' ? 'green' : 'red'));
     }
     
     return (
@@ -800,11 +792,11 @@ function HomePage() {
               icon={
                 new L.divIcon({
                   className: 'custom-icon',
-                  html: ReactDOMServer.renderToString(<GiValve size={30} color={currentColor3} />),
+                  html: ReactDOMServer.renderToString(<GiValve size={30} color={currentColor2} />),
                   iconSize: [30, 30],
                 })
               }
-              eventHandlers={{ click: () => handleSolonoidClick3() }}
+              eventHandlers={{ click: () => handleSolonoidClick2() }}
             >
             </Marker>
             <Marker
@@ -836,11 +828,11 @@ function HomePage() {
               icon={
                 new L.divIcon({
                   className: 'custom-icon',
-                  html: ReactDOMServer.renderToString(<GiValve size={30} color={currentColor6} />),
+                  html: ReactDOMServer.renderToString(<GiValve size={30} color={currentColor5} />),
                   iconSize: [30, 30],
                 })
               }
-              eventHandlers={{ click: () => handleSolonoidClick6() }}
+              eventHandlers={{ click: () => handleSolonoidClick5() }}
             >
             </Marker>
           </MapContainer>
