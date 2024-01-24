@@ -33,7 +33,7 @@ function ActuationPage() {
       // Dynamically generate array based on the state of valve1 and valve3
       const arrayToSend = [isOn.valve1 ? 1 : 0, isOn.valve3 ? 1 : 0];
 
-      const response = await axios.post('http://localhost:8080/actuation', { array: arrayToSend });
+      const response = await axios.post('http://10.3.1.117:8080/actuation', { array: arrayToSend });
       console.log('Array sent to backend:', arrayToSend);
     } catch (error) {
       console.error('Error sending array to backend:', error);
