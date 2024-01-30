@@ -143,6 +143,48 @@ function HomePage() {
   });
 
 
+  const [solenoidStatus, setSolenoidStatus] = useState({
+    solenoid1: false,
+    solenoid2: false,
+    solenoid3: false,
+    solenoid4: false,
+    solenoid5: false,
+    solenoid6: false,
+  });
+  
+  // Assuming you have specific pipeline sections associated with each solenoid
+  const pipelineSections = {
+    solenoid1: [dt_node_1, dt_node_2, dt_node_3],  // Adjust these coordinates based on your actual pipeline sections
+    solenoid2: [n1, n2, n3, n4],
+    solenoid3: [n5, n6, n7, n8],
+    // ... add sections for other solenoids
+  };
+  
+  const calculateFlow = () => {
+    let totalFlow = 0;
+  
+    // Iterate over each solenoid and update the flow based on its status
+    for (const solenoidKey in solenoidStatus) {
+      const isSolenoidOn = solenoidStatus[solenoidKey];
+  
+      // If the solenoid is on, calculate the flow for its associated pipeline section
+      if (isSolenoidOn) {
+        const sectionCoordinates = pipelineSections[solenoidKey];
+        totalFlow += calculateFlowForSection(sectionCoordinates);
+      }
+    }
+  
+    return totalFlow;
+  };
+  
+  // Function to calculate flow for a specific pipeline section based on coordinates
+  const calculateFlowForSection = (coordinates) => {
+    // You need to replace this with your actual logic to calculate flow for each section
+    // For now, I'm just returning a placeholder value (adjust as needed)
+    return 50; // Adjust this value based on your calculation for the section
+  };
+  
+
   const actuationToBackend = async () => {
     try {
       const arrayToSend = [0, 1];
@@ -241,14 +283,14 @@ function HomePage() {
       try {
         const response = await axios.post('http://10.3.1.117:8080/nodeVal');
         const data = response.data['nodeVal'];
-        console.log("New Node Value = ", data)
-        setnodeVal(data)
+        console.log("New Node Value = ", data);
+        setnodeVal(data); // Update this line
         return data;
-
       } catch (error) {
         console.error('Error fetching real-time data:', error);
       }
     };
+    
 
     
   
@@ -298,7 +340,7 @@ function HomePage() {
         console.log('Percentage along the Line 3-1:', percentage3.toFixed(2), '%');
 
         postPercentDist([percentage1, percentage2, percentage3]);
-        const nodeValue = getNewValue()
+        // const nodeValue = getNewValue()
         // console.log("Original Value",nodeValue)
         // setnodeVal(nodeValue)
         // console.log("Calculated Val",nodeVal)
@@ -479,16 +521,23 @@ function HomePage() {
   
     const buildPopupContent = (index) => {
       const marker = markers[index];
-      if (marker && clickedLatLng) {
+      if (marker) {
+        const flow = calculateFlow();
+        const { clickedLatLng } = marker;
+        const latitude = clickedLatLng?.latitude || 'N/A'; // Use optional chaining to handle null or undefined
+        const longitude = clickedLatLng?.longitude || 'N/A';
+    
         return (
           <div>
             {`Marker ${index + 1} - Clicked Coordinates:`}
             <br />
-            Latitude: {clickedLatLng.latitude}
+            Latitude: {marker.position[0].toFixed(6)}
             <br />
-            Longitude: {clickedLatLng.longitude}
+            Longitude: {marker.position[1].toFixed(6)}
             <br />
-            Calculated TDS Value: {nodeVal}
+            Calculated TDS Value: {marker.nodeVal || 'N/A'}
+            <br />
+            Flow: {flow}
           </div>
         );
       } else {
@@ -503,6 +552,9 @@ function HomePage() {
         );
       }
     };
+    
+    
+    
   
     const buildSaltPopupContent = (index) => {
       const marker = saltmarkers[index];
@@ -554,20 +606,41 @@ function HomePage() {
       }
     };
   
-    const addMarker = () => {
+    const addMarker = async () => {
       if (latitudeInput && longitudeInput) {
+        // Get the initial nodeVal for the new marker
+        const initialNodeVal = await getInitialNodeVal();
+    
         const newMarker = {
           position: [parseFloat(latitudeInput), parseFloat(longitudeInput)],
           temparature: 0,
           u_tds: 0,
           total_flow: 0,
           v_tds: 0,
+          nodeVal: initialNodeVal,
         };
+    
         setMarkers([...markers, newMarker]);
         setLatitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
         setLongitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
       }
     };
+
+    const getInitialNodeVal = async () => {
+      try {
+        const response = await axios.post('http://10.3.1.117:8080/nodeVal');
+        const data = response.data['nodeVal'];
+        console.log("Initial Node Value = ", data);
+        return data;
+      } catch (error) {
+        console.error('Error fetching real-time data:', error);
+        return null; // Return null in case of an error
+      }
+    };
+    
+        
+    
+    
   
     const addSaltMarker = () => {
       if (latitudeInput && longitudeInput) {
@@ -664,21 +737,28 @@ function HomePage() {
 
     const handleSolonoidClick1 = () => {
       setCurrentColor1((prevColor) => (prevColor === 'red' ? 'green' : 'red'));
+      setSolenoidStatus((prevState) => ({ ...prevState, solenoid1: !prevState.solenoid1 }));
     }
+    
     const handleSolonoidClick2 = () => {
       setCurrentColor2((prevColor) => (prevColor === 'red' ? 'green' : 'red'));
+      setSolenoidStatus((prevState) => ({ ...prevState, solenoid2: !prevState.solenoid2 }));
     }
     const handleSolonoidClick3 = () => {
       setCurrentColor3((prevColor) => (prevColor === 'red' ? 'green' : 'red'));
+      setSolenoidStatus((prevState) => ({ ...prevState, solenoid3: !prevState.solenoid3 }));
     }
     const handleSolonoidClick4 = () => {
       setCurrentColor4((prevColor) => (prevColor === 'red' ? 'green' : 'red'));
+      setSolenoidStatus((prevState) => ({ ...prevState, solenoid4: !prevState.solenoid4 }));
     }
     const handleSolonoidClick5 = () => {
       setCurrentColor5((prevColor) => (prevColor === 'red' ? 'green' : 'red'));
+      setSolenoidStatus((prevState) => ({ ...prevState, solenoid5: !prevState.solenoid5 }));
     }
     const handleSolonoidClick6 = () => {
       setCurrentColor6((prevColor) => (prevColor === 'red' ? 'green' : 'red'));
+      setSolenoidStatus((prevState) => ({ ...prevState, solenoid6: !prevState.solenoid6 }));
     }
     
     return (
