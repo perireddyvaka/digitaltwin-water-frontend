@@ -127,14 +127,23 @@ function HomePage() {
     solenoid5: false,
     solenoid6: false,
   });
+
+  const [PipeFlowStatus, setPipeFlowStatus] = useState({
+    pipe1: false,
+    pipe2: false,
+    pipe3: false,
+    pipe4: false,
+    pipe5: false,
+    pipe6: false,
+  });
   
   const pipeSections = [
     [
-      [17.447299287603173, 78.34905803203584],  // start coordinates for solenoid pipe 1
-      [17.446654466596936, 78.34984123706819],  // end coordinates for solenoid pipe 1
+      [17.447299287603173, 78.34906339645387],  // start coordinates for solenoid pipe 1
+      [17.446797760350986, 78.34966421127321],  // end coordinates for solenoid pipe 1
     ],
     [
-      [17.447534697878407, 78.34879517555238], // start coordinates for solenoid pipe 2
+      [17.447739402218467, 78.34897220134737], // start coordinates for solenoid pipe 2
       [17.44777010784964, 78.34901511669159] //end coordinates for solenoid pipe 2
     ],
     [
@@ -142,16 +151,16 @@ function HomePage() {
       [17.447457933691627, 78.34939599037172]  //end coordinates for solenoid pipe 3
     ],
     [
-      [17.4464548786804, 78.35007190704347],  // start coordinates for solenoid pipe 4
-      [17.446111996364973, 78.35048496723176],      // end coordinates for solenoid pipe 4
+      [17.447002465518526, 78.3499699831009],  // start coordinates for solenoid pipe 4
+      [17.44662887841472, 78.3503830432892],      // end coordinates for solenoid pipe 4
     ],
     [
       [17.446772172188876, 78.34973931312562], // start coordinates for solenoid pipe 5
       [17.446905230592602, 78.35007727146149]  //end coordinates for solenoid pipe 5
     ],
     [
-      [17.446459996322027, 78.35007190704347],  // start coordinates for solenoid pipe 6
-      [17.446147819920625, 78.35044205188751],      // end coordinates for solenoid pipe 6
+      [17.44638067286084, 78.35017919540407],  // start coordinates for solenoid pipe 6
+      [17.44612990814367, 78.3504742383957],      // end coordinates for solenoid pipe 6
     ],
 
   ];
@@ -164,24 +173,88 @@ function HomePage() {
   ];
 
 // Calculating the flow how much is there at that point test case for example 
+  // const calculateFlow = () => {
+  //   // Initialize the flow to some default value (0 in this case)
+  //   let totalFlow = 0;
+  //   // Iterate over the pipe sections and update the flow based on each section
+  //   for (let i = 0; i < pipeSections.length; i++) {
+  //     const [startCoords, endCoords] = pipeSections[i];
+  //     const isSolenoidOn = isSolenoidOnForSection(i + 1);
+
+  //     if (isSolenoidOn) {
+  //       const flowForSection = calculateFlowForSection(startCoords, endCoords);
+  //       console.log(`Flow for Section ${i + 1}: ${flowForSection}`);
+  //       totalFlow += flowForSection;
+  //     }
+  //   }
+  
+  //   console.log(`Total Flow: ${totalFlow}`);
+  //   return totalFlow;
+  // };
+
   const calculateFlow = () => {
-    // Initialize the flow to some default value (0 in this case)
-    let totalFlow = 0;
     // Iterate over the pipe sections and update the flow based on each section
     for (let i = 0; i < pipeSections.length; i++) {
       const [startCoords, endCoords] = pipeSections[i];
       const isSolenoidOn = isSolenoidOnForSection(i + 1);
-
+  
+      markers.forEach((marker, index) => {
+        const isMarkerInSection = isMarkerInPipeSection(marker.position, [startCoords, endCoords]);
+  
+        // Log the section number for the current marker
+        if (isMarkerInSection) {
+          console.log(`Marker ${index + 1} is in Section ${i + 1}`);
+        }
+      });
+  
       if (isSolenoidOn) {
         const flowForSection = calculateFlowForSection(startCoords, endCoords);
         console.log(`Flow for Section ${i + 1}: ${flowForSection}`);
-        totalFlow += flowForSection;
       }
     }
   
-    console.log(`Total Flow: ${totalFlow}`);
-    return totalFlow;
+    // No need to return totalFlow in this case
   };
+
+  const getSectionNumber = (markerPosition) => {
+    for (let i = 0; i < pipeSections.length; i++) {
+      const [startCoords, endCoords] = pipeSections[i];
+      if (isMarkerInPipeSection(markerPosition, [startCoords, endCoords])) {
+        return i + 1; // Section numbers start from 1
+      }
+    }
+    return null; // Marker not in any section
+  };
+  
+  const isMarkerInPipeSection = (markerPosition, [startCoords, endCoords]) => {
+  // Calculate the distance of the marker to the line formed by the start and end coordinates
+  const distanceToLine = distanceToLineFromPoint(markerPosition, startCoords, endCoords);
+
+  // You need to define a threshold value based on your application
+  const markerThreshold = 0.000009; // Example threshold, adjust as needed
+
+  // Check if the distance is within the threshold
+  return distanceToLine <= markerThreshold;
+};
+
+// Function to calculate the distance of a point to a line defined by two other points
+const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
+  const [x, y] = point;
+  const [x1, y1] = lineStart;
+  const [x2, y2] = lineEnd;
+
+  const numerator = Math.abs((x2 - x1) * (y1 - y) - (x1 - x) * (y2 - y1));
+  const denominator = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+
+  return numerator / denominator;
+};
+
+
+  const calculateFlowForSection = (isSolenoidOn) => {
+    // Return 1 if solenoid is on, 0 otherwise
+    return isSolenoidOn ? 1 : 0;
+  };
+  
 
   const isSolenoidOnForSection = (sectionNumber) => {
     const isOn = solenoidStatus[`solenoid${sectionNumber}`];
@@ -189,11 +262,11 @@ function HomePage() {
     return isOn;
   };
   
-  const calculateFlowForSection = (startCoords, endCoords) => {
-    const distance = mapRef.current.distance(startCoords, endCoords); 
-    console.log(`Distance for Section: ${distance}`);
-    return distance * 10;
-  };
+  // const calculateFlowForSection = (startCoords, endCoords) => {
+  //   const distance = mapRef.current.distance(startCoords, endCoords); 
+  //   console.log(`Distance for Section: ${distance}`);
+  //   return distance * 10;
+  // };
   
     const mapRef = useRef();
   
@@ -472,8 +545,10 @@ function HomePage() {
   
     const buildPopupContent = (index) => {
       const marker = markers[index];
+      const sectionNumber = getSectionNumber(marker.position);
       if (marker) {
         const flow = calculateFlow();
+        const isSolenoidOn = isSolenoidOnForSection(sectionNumber);
         const { clickedLatLng } = marker;
         const latitude = clickedLatLng?.latitude || 'N/A'; // Use optional chaining to handle null or undefined
         const longitude = clickedLatLng?.longitude || 'N/A';
@@ -484,11 +559,13 @@ function HomePage() {
             <br />
             Latitude: {marker.position[0].toFixed(6)}
             <br />
-            Longitude: {marker.longitude}
+            Longitude: {marker.position[1].toFixed(6)}
             <br />
             Calculated TDS Value: {marker.nodeVal || 'N/A'}
             <br />
             Flow: {flow}
+            <br />
+            Is Solenoid On: {isSolenoidOn ? 'Yes' : 'No'}
           </div>
         );
       } else {
