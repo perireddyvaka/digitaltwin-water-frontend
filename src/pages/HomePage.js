@@ -533,7 +533,7 @@ function HomePage() {
             <br />
             Latitude: {marker.position[0].toFixed(6)}
             <br />
-            Longitude: {marker.position[1].toFixed(6)}
+            Longitude: {marker.longitude}
             <br />
             Calculated TDS Value: {marker.nodeVal || 'N/A'}
             <br />
