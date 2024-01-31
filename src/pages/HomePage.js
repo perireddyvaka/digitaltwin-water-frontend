@@ -112,7 +112,7 @@ function HomePage() {
     const [selectedMarkerIndex, setSelectedMarkerIndex] = useState(null);
   
     const [lastNodeCrossed, setLastNodeCrossed] = useState(null);
-    const [nodeVal, setnodeVal] = useState(null)
+    const [nodeVal_utds, setnodeVal_utds] = useState(null)
   const [realTimeLocation, setRealTimeLocation] = useState({
     latitude: 0,
     longitude: 0
@@ -151,16 +151,16 @@ function HomePage() {
       [17.447457933691627, 78.34939599037172]  //end coordinates for solenoid pipe 3
     ],
     [
-      [17.447002465518526, 78.3499699831009],  // start coordinates for solenoid pipe 4
-      [17.44662887841472, 78.3503830432892],      // end coordinates for solenoid pipe 4
+      [17.446465113963484, 78.35006117820741],  // start coordinates for solenoid pipe 4
+      [17.446127349318246, 78.3504742383957],      // end coordinates for solenoid pipe 4
     ],
     [
-      [17.446772172188876, 78.34973931312562], // start coordinates for solenoid pipe 5
-      [17.446905230592602, 78.35007727146149]  //end coordinates for solenoid pipe 5
+      [17.446997347892143, 78.34995925426485], // start coordinates for solenoid pipe 5
+      [17.446654466596936, 78.35035622119905]  //end coordinates for solenoid pipe 5
     ],
     [
-      [17.44638067286084, 78.35017919540407],  // start coordinates for solenoid pipe 6
-      [17.44612990814367, 78.3504742383957],      // end coordinates for solenoid pipe 6
+      [17.446465113963484, 78.35006117820741],  // start coordinates for solenoid pipe 6
+      [17.446127349318246, 78.3504742383957],      // end coordinates for solenoid pipe 6
     ],
 
   ];
@@ -352,17 +352,17 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
     };
 
 
-    const getNewValue = async () => {
-      try {
-        const response = await axios.post('http://10.3.1.117:8080/nodeVal');
-        const data = response.data['nodeVal'];
-        console.log("New Node Value = ", data);
-        setnodeVal(data); // Update this line
-        return data;
-      } catch (error) {
-        console.error('Error fetching real-time data:', error);
-      }
-    };
+    // const getNewValue = async () => {
+    //   try {
+    //     const response = await axios.post('http://10.3.1.117:8080/nodeVal');
+    //     const utds = response.data['nodeVal_utds'];
+    //     console.log("New Node Value = ", utds);
+    //     setnodeVal_utds(utds); // Update this line
+    //     return utds;
+    //   } catch (error) {
+    //     console.error('Error fetching real-time data:', error);
+    //   }
+    // };
 
     const handleMapClick = (e) => {
       console.log("handleMapClick Called ");
@@ -553,17 +553,27 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
         const latitude = clickedLatLng?.latitude || 'N/A'; // Use optional chaining to handle null or undefined
         const longitude = clickedLatLng?.longitude || 'N/A';
     
+        // Display all the parameters when the solenoid is on
+        const temperatureValue = isSolenoidOn ? (marker.temparature || 'N/A') : '0';
+        const uTDSValue = isSolenoidOn ? (marker.u_tds || 'N/A') : '0';
+        const totalFlowValue = isSolenoidOn ? (marker.total_flow || 'N/A') : '0';
+        const vTDSValue = isSolenoidOn ? (marker.v_tds || 'N/A') : '0';
+    
         return (
           <div>
-            {`Marker ${index + 1} - Clicked Coordinates:`}
-            <br />
+            {`Marker ${index + 1} - Predicted Values:`}
+            {/* <br />
             Latitude: {marker.position[0].toFixed(6)}
             <br />
-            Longitude: {marker.position[1].toFixed(6)}
+            Longitude: {marker.position[1].toFixed(6)} */}
             <br />
-            Calculated TDS Value: {marker.nodeVal || 'N/A'}
+            Calculated Temperature: {temperatureValue}
             <br />
-            Flow: {flow}
+            Calculated TDS Values: {uTDSValue}
+            <br />
+            Calculated Total Flow: {totalFlowValue}
+            <br />
+            Calculated v_TDS: {vTDSValue}
             <br />
             Is Solenoid On: {isSolenoidOn ? 'Yes' : 'No'}
           </div>
@@ -579,7 +589,8 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
           </div>
         );
       }
-    }; 
+    };
+    
   
     const buildSaltPopupContent = (index) => {
       const marker = saltmarkers[index];
@@ -634,27 +645,56 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
     const getInitialNodeVal = async () => {
       try {
         const response = await axios.post('http://10.3.1.117:8080/nodeVal');
-        const data = response.data['nodeVal'];
-        console.log("Initial Node Value = ", data);
-        return data;
+        // const response = await axios.post('http://localhost:8080/nodeVal');
+        const temp = response.data['nodeVal_temp']
+        const utds = response.data['nodeVal_utds'];
+        const ctds = response.data['nodeVal_ctds']
+        const vol = response.data['nodeVal_vol']
+        console.log("Temparature: ", temp," utds: ", utds , " ctds: ",ctds," vol: ", vol);
+        return { temp, utds, ctds, vol };
       } catch (error) {
         console.error('Error fetching real-time data:', error);
         return null; // Return null in case of an error
       }
     };
   
+    // const addMarker = async () => {
+    //   if (latitudeInput && longitudeInput) {
+    //     try{
+    //     // Get the initial nodeVal for the new marker
+    //     const initialNodeVal = await getInitialNodeVal();
+    
+    //     const newMarker = {
+    //       position: [parseFloat(latitudeInput), parseFloat(longitudeInput)],
+    //       temparature: initialNodeVal.temp || 0,
+    //       u_tds: initialNodeVal.utds || 0,
+    //       total_flow: initialNodeVal.ctds || 0,
+    //       v_tds: initialNodeVal.vol || 0,
+    //       nodeVal_utds: initialNodeVal.utds || 0,
+    //     };
+    
+    //     setMarkers([...markers, newMarker]);
+    //     setLatitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
+    //     setLongitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
+    //   }catch (error) {
+    //     console.error('Error adding marker:', error);
+    //   }
+    // }
+    // };
+
     const addMarker = async () => {
       if (latitudeInput && longitudeInput) {
         // Get the initial nodeVal for the new marker
         const initialNodeVal = await getInitialNodeVal();
+        console.log("initial val",initialNodeVal)
     
         const newMarker = {
           position: [parseFloat(latitudeInput), parseFloat(longitudeInput)],
-          temparature: 0,
-          u_tds: 0,
-          total_flow: 0,
-          v_tds: 0,
-          nodeVal: initialNodeVal,
+          temparature: initialNodeVal ? initialNodeVal.temp || 0 : 0,
+          u_tds: initialNodeVal ? initialNodeVal.utds || 0 : 0,
+          total_flow: initialNodeVal ? initialNodeVal.ctds || 0 : 0,
+          v_tds: initialNodeVal ? initialNodeVal.vol || 0 : 0,
+          nodeVal_utds: initialNodeVal ? initialNodeVal.utds || 0 : 0,
         };
     
         setMarkers([...markers, newMarker]);
@@ -662,6 +702,9 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
         setLongitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
       }
     };
+    
+    
+    
 
     const addSaltMarker = () => {
       if (latitudeInput && longitudeInput) {
