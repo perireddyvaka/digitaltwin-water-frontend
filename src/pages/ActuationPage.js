@@ -6,6 +6,7 @@ import { GiWaterTower, GiValve} from "react-icons/gi"
 import { MdOutlineInbox } from "react-icons/md";
 import { FaBoxArchive } from "react-icons/fa6";
 import axios from 'axios';
+import InstructionBox from '../components/InstructionBox/InstructionBox';
 
 
 import NavigationBar from '../components/Navigation/Navigation';
@@ -74,6 +75,7 @@ function ActuationPage() {
           </div>
 
       </div>
+      <InstructionBox />
         {/* Table for Icons and Text */}
         <table style={{ margin: 'auto', marginTop: '30px', borderCollapse: 'collapse', width: "300px" }}>
           <thead>
