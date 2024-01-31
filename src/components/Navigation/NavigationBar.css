@@ -7,7 +7,7 @@
     background-color: #123462;
     color: white;
     padding: 10px 20px;
-    z-index: 100;
+    z-index: 1000;
     display: flex;
     justify-content: space-between;
     align-items: center;

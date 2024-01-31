@@ -6,6 +6,7 @@ import SCRCLOGO from './images/scrc_logo.png';
 
 const NavigationBar = () => {
   return (
+    <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', zIndex: 1000 }}>
     <nav className="navbar">
       <Link to="/"> {/* Add Link to the root route */}
         <div className="navbar__logo">
@@ -19,6 +20,7 @@ const NavigationBar = () => {
         </div>
       </Link>
     </nav>
+    </div>
   );
 };
 
