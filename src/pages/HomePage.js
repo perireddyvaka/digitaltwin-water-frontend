@@ -17,17 +17,18 @@ import NavigationBar from '../components/Navigation/Navigation';
 import '../App.css';
 
 
-
-
+// Coordinates for Nodes 
 const dt_node_1 = [17.44773337470836, 78.34853368169597];
 const dt_node_2 = [17.44711288989055, 78.34927584903512];
 const dt_node_3 = [17.446087802969153, 78.35051801020884];
 
+// Coordinates for variance distances wrt to the pipeline for marker validation
 const newNode1 = [dt_node_1[0] - 0.00005, dt_node_1[1] - 0.00005];
 const newNode3 = [dt_node_3[0] - 0.00005, dt_node_3[1] - 0.00005];
 const newNode4 = [dt_node_1[0] + 0.00005, dt_node_1[1] + 0.00005];
 const newNode6 = [dt_node_3[0] + 0.00005, dt_node_3[1] + 0.00005];
 
+// Coordinates for Polyine pipelines for the sideways
 const n1 = [17.4475186984464, 78.34878444671632]
 const n2 = [17.447779877527292, 78.34900975227357]
 const n3 = [17.447467486818034, 78.34940671920778]
@@ -37,6 +38,8 @@ const n6 = [17.447016823868076, 78.34993779659273]
 const n7 = [17.446622492872986, 78.3503830432892]
 const n8 = [17.446366433328517, 78.35017383098604]
 
+
+// Validation Coordinates
 const new1 = [17.447549425416515, 78.34874153137208];
 const new2 = [17.447493092634005, 78.34880590438844];
 const new3 = [17.44782681109489, 78.34901511669159 ];
@@ -55,39 +58,11 @@ const New6 = [17.446325463768034, 78.35022211074829];
 const New7 = [17.446607129310465, 78.35031330585481];
 const New8 = [17.44662761406022, 78.35045814514162];
 
-
+// Map Position for View 
 const mapPosition = [17.44695, 78.34891];
 
-// async function getNodeLocation(nodeId) {
-//   let url = `http://127.0.0.1:8080/desc/${nodeId}`;
 
-//   try {
-//     let response = await fetch(url);
-//     let data = await response.json();
-
-//     // Extract and parse Node Location
-//     let nodeLocationStr = data['Node Location'];
-//     let nodeLocation = JSON.parse(nodeLocationStr);
-
-//     console.log(`Node ${nodeId} Location:`, nodeLocation);
-    
-//     // Further actions with the node location data can be performed here
-//     // For instance, updating state in React, displaying on the UI, etc.
-//   } catch (error) {
-//     console.error(`Error fetching data for Node ${nodeId}:`, error);
-//   }
-// }
-
-// // Usage example
-// getNodeLocation('Node-1');
-
-
-
-
-// // Call the function to display node location in the console
-// displayNodeLocation();
-
-
+// Data for the Nodes(1,2,3) along with their parameters
 const data = [
   {
     "Node ID": "Node-1",
@@ -121,6 +96,7 @@ const data = [
   }
 ];
 
+// Main Home Page Function
 function HomePage() {
     const [markers, setMarkers] = useState([]);
     const [saltmarkers, setSaltMarkers] = useState([]);
@@ -136,13 +112,13 @@ function HomePage() {
     const [selectedMarkerIndex, setSelectedMarkerIndex] = useState(null);
   
     const [lastNodeCrossed, setLastNodeCrossed] = useState(null);
-    const [nodeVal, setnodeVal] = useState(null)
+    const [nodeVal_utds, setnodeVal_utds] = useState(null)
   const [realTimeLocation, setRealTimeLocation] = useState({
     latitude: 0,
     longitude: 0
   });
 
-
+// Declaring all the solenoids in the off state which is false 
   const [solenoidStatus, setSolenoidStatus] = useState({
     solenoid1: false,
     solenoid2: false,
@@ -151,49 +127,146 @@ function HomePage() {
     solenoid5: false,
     solenoid6: false,
   });
+
+  const [PipeFlowStatus, setPipeFlowStatus] = useState({
+    pipe1: false,
+    pipe2: false,
+    pipe3: false,
+    pipe4: false,
+    pipe5: false,
+    pipe6: false,
+  });
   
-  // Assuming you have specific pipeline sections associated with each solenoid
-  const pipelineSections = {
-    solenoid1: [dt_node_1, dt_node_2, dt_node_3],  // Adjust these coordinates based on your actual pipeline sections
-    solenoid2: [n1, n2, n3, n4],
-    solenoid3: [n5, n6, n7, n8],
-    // ... add sections for other solenoids
-  };
+  const pipeSections = [
+    [
+      [17.447299287603173, 78.34906339645387],  // start coordinates for solenoid pipe 1
+      [17.446797760350986, 78.34966421127321],  // end coordinates for solenoid pipe 1
+    ],
+    [
+      [17.447739402218467, 78.34897220134737], // start coordinates for solenoid pipe 2
+      [17.44777010784964, 78.34901511669159] //end coordinates for solenoid pipe 2
+    ],
+    [
+      [17.447212288076706, 78.34919214248657], // start coordinates for solenoid pipe 3
+      [17.447457933691627, 78.34939599037172]  //end coordinates for solenoid pipe 3
+    ],
+    [
+      [17.446465113963484, 78.35006117820741],  // start coordinates for solenoid pipe 4
+      [17.446127349318246, 78.3504742383957],      // end coordinates for solenoid pipe 4
+    ],
+    [
+      [17.446997347892143, 78.34995925426485], // start coordinates for solenoid pipe 5
+      [17.446654466596936, 78.35035622119905]  //end coordinates for solenoid pipe 5
+    ],
+    [
+      [17.446465113963484, 78.35006117820741],  // start coordinates for solenoid pipe 6
+      [17.446127349318246, 78.3504742383957],      // end coordinates for solenoid pipe 6
+    ],
+
+  ];
+// This is the pipeline where always the water flow is present 
+  const alwaysFlowSections =[
+    [
+      [17.447698461368848, 78.34858059883119],
+      [17.447468168918405, 78.34886491298677],
+    ],
+  ];
+
+// Calculating the flow how much is there at that point test case for example 
+  // const calculateFlow = () => {
+  //   // Initialize the flow to some default value (0 in this case)
+  //   let totalFlow = 0;
+  //   // Iterate over the pipe sections and update the flow based on each section
+  //   for (let i = 0; i < pipeSections.length; i++) {
+  //     const [startCoords, endCoords] = pipeSections[i];
+  //     const isSolenoidOn = isSolenoidOnForSection(i + 1);
+
+  //     if (isSolenoidOn) {
+  //       const flowForSection = calculateFlowForSection(startCoords, endCoords);
+  //       console.log(`Flow for Section ${i + 1}: ${flowForSection}`);
+  //       totalFlow += flowForSection;
+  //     }
+  //   }
   
+  //   console.log(`Total Flow: ${totalFlow}`);
+  //   return totalFlow;
+  // };
+
   const calculateFlow = () => {
-    let totalFlow = 0;
+    // Iterate over the pipe sections and update the flow based on each section
+    for (let i = 0; i < pipeSections.length; i++) {
+      const [startCoords, endCoords] = pipeSections[i];
+      const isSolenoidOn = isSolenoidOnForSection(i + 1);
   
-    // Iterate over each solenoid and update the flow based on its status
-    for (const solenoidKey in solenoidStatus) {
-      const isSolenoidOn = solenoidStatus[solenoidKey];
+      markers.forEach((marker, index) => {
+        const isMarkerInSection = isMarkerInPipeSection(marker.position, [startCoords, endCoords]);
   
-      // If the solenoid is on, calculate the flow for its associated pipeline section
+        // Log the section number for the current marker
+        if (isMarkerInSection) {
+          console.log(`Marker ${index + 1} is in Section ${i + 1}`);
+        }
+      });
+  
       if (isSolenoidOn) {
-        const sectionCoordinates = pipelineSections[solenoidKey];
-        totalFlow += calculateFlowForSection(sectionCoordinates);
+        const flowForSection = calculateFlowForSection(startCoords, endCoords);
+        console.log(`Flow for Section ${i + 1}: ${flowForSection}`);
       }
     }
   
-    return totalFlow;
+    // No need to return totalFlow in this case
+  };
+
+  const getSectionNumber = (markerPosition) => {
+    for (let i = 0; i < pipeSections.length; i++) {
+      const [startCoords, endCoords] = pipeSections[i];
+      if (isMarkerInPipeSection(markerPosition, [startCoords, endCoords])) {
+        return i + 1; // Section numbers start from 1
+      }
+    }
+    return null; // Marker not in any section
   };
   
-  // Function to calculate flow for a specific pipeline section based on coordinates
-  const calculateFlowForSection = (coordinates) => {
-    // You need to replace this with your actual logic to calculate flow for each section
-    // For now, I'm just returning a placeholder value (adjust as needed)
-    return 50; // Adjust this value based on your calculation for the section
+  const isMarkerInPipeSection = (markerPosition, [startCoords, endCoords]) => {
+  // Calculate the distance of the marker to the line formed by the start and end coordinates
+  const distanceToLine = distanceToLineFromPoint(markerPosition, startCoords, endCoords);
+
+  // You need to define a threshold value based on your application
+  const markerThreshold = 0.000009; // Example threshold, adjust as needed
+
+  // Check if the distance is within the threshold
+  return distanceToLine <= markerThreshold;
+};
+
+// Function to calculate the distance of a point to a line defined by two other points
+const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
+  const [x, y] = point;
+  const [x1, y1] = lineStart;
+  const [x2, y2] = lineEnd;
+
+  const numerator = Math.abs((x2 - x1) * (y1 - y) - (x1 - x) * (y2 - y1));
+  const denominator = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+
+  return numerator / denominator;
+};
+
+
+  const calculateFlowForSection = (isSolenoidOn) => {
+    // Return 1 if solenoid is on, 0 otherwise
+    return isSolenoidOn ? 1 : 0;
   };
   
 
-  const actuationToBackend = async () => {
-    try {
-      const arrayToSend = [0, 1];
-      const response = await axios.post('http://10.3.1.117:8080/actuation', { array: arrayToSend });
-      console.log('Array sent to backend:', arrayToSend);
-    } catch (error) {
-      console.error('Error sending array to backend:', error);
-    }
-  }; 
+  const isSolenoidOnForSection = (sectionNumber) => {
+    const isOn = solenoidStatus[`solenoid${sectionNumber}`];
+    console.log(`Solenoid ${sectionNumber} is ${isOn ? 'ON' : 'OFF'}`);
+    return isOn;
+  };
+  
+  // const calculateFlowForSection = (startCoords, endCoords) => {
+  //   const distance = mapRef.current.distance(startCoords, endCoords); 
+  //   console.log(`Distance for Section: ${distance}`);
+  //   return distance * 10;
+  // };
   
     const mapRef = useRef();
   
@@ -279,21 +352,18 @@ function HomePage() {
     };
 
 
-    const getNewValue = async () => {
-      try {
-        const response = await axios.post('http://10.3.1.117:8080/nodeVal');
-        const data = response.data['nodeVal'];
-        console.log("New Node Value = ", data);
-        setnodeVal(data); // Update this line
-        return data;
-      } catch (error) {
-        console.error('Error fetching real-time data:', error);
-      }
-    };
-    
+    // const getNewValue = async () => {
+    //   try {
+    //     const response = await axios.post('http://10.3.1.117:8080/nodeVal');
+    //     const utds = response.data['nodeVal_utds'];
+    //     console.log("New Node Value = ", utds);
+    //     setnodeVal_utds(utds); // Update this line
+    //     return utds;
+    //   } catch (error) {
+    //     console.error('Error fetching real-time data:', error);
+    //   }
+    // };
 
-    
-  
     const handleMapClick = (e) => {
       console.log("handleMapClick Called ");
       const latitude = e.latlng.lat;
@@ -340,10 +410,6 @@ function HomePage() {
         console.log('Percentage along the Line 3-1:', percentage3.toFixed(2), '%');
 
         postPercentDist([percentage1, percentage2, percentage3]);
-        // const nodeValue = getNewValue()
-        // console.log("Original Value",nodeValue)
-        // setnodeVal(nodeValue)
-        // console.log("Calculated Val",nodeVal)
     
         // Proceed to add a marker
         const newMarker = {
@@ -432,54 +498,12 @@ function HomePage() {
       }
     };
     
-    
-  
-    // Nearest Node Calculator with distance
-    // const handleMapClick = (e) => {
-    //   console.log("handleMapClick Called ");
-    //   const latitude = e.latlng.lat;
-    //   const longitude = e.latlng.lng;
-    //   setClickedLatLng({ latitude, longitude });
-    //   console.log(latitude, longitude);
-    
-    //   const rectangleBounds = L.latLngBounds([newNode1, newNode2, newNode3, newNode6]);
-    
-    //   // Check if the clicked point is inside the rectangle
-    //   if (rectangleBounds.contains([latitude, longitude])) {
-    //     console.log("Marker added");
-    //     const newMarker = {
-    //       position: [latitude, longitude],
-    //       flowrate: 0,
-    //       totalflow: 0,
-    //     };
-    //     setMarkers([...markers, newMarker]);
-    //     setLatitudeInput('');
-    //     setLongitudeInput('');
-    
-    //     // Get the nearest node details
-    //     const nearestNodeDetails = getNearestNode([latitude, longitude]);
-    //     console.log('Nearest Node:', nearestNodeDetails.node);
-    //     console.log('Distance to Nearest Node:', nearestNodeDetails.distance.toFixed(2), 'meters');
-    //   } else {
-    //     // The clicked point is not inside the rectangle, show an alert
-    //     console.log("Invalid Placement");
-    //     Swal.fire({
-    //       title: 'Invalid Placement',
-    //       text: 'Please place the marker inside the rectangle.',
-    //       icon: 'error',
-    //       confirmButtonText: 'OK',
-    //     });
-    //   }
-    // };
-  
-    
-  
     useEffect(() => {
       const fetchData = async () => {
         try {
           const response = await axios.post('http://10.3.1.117:8080/real-time-location');
           const data = response.data;
-          console.log("real time loc = ", data)
+          // console.log("real time loc = ", data)
           setRealTimeLocation(data);
           console.log("rtl = ", realTimeLocation);
         } catch (error) {
@@ -521,23 +545,37 @@ function HomePage() {
   
     const buildPopupContent = (index) => {
       const marker = markers[index];
+      const sectionNumber = getSectionNumber(marker.position);
       if (marker) {
         const flow = calculateFlow();
+        const isSolenoidOn = isSolenoidOnForSection(sectionNumber);
         const { clickedLatLng } = marker;
         const latitude = clickedLatLng?.latitude || 'N/A'; // Use optional chaining to handle null or undefined
         const longitude = clickedLatLng?.longitude || 'N/A';
     
+        // Display all the parameters when the solenoid is on
+        const temperatureValue = isSolenoidOn ? (marker.temparature || 'N/A') : '0';
+        const uTDSValue = isSolenoidOn ? (marker.u_tds || 'N/A') : '0';
+        const totalFlowValue = isSolenoidOn ? (marker.total_flow || 'N/A') : '0';
+        const vTDSValue = isSolenoidOn ? (marker.v_tds || 'N/A') : '0';
+    
         return (
           <div>
-            {`Marker ${index + 1} - Clicked Coordinates:`}
-            <br />
+            {`Marker ${index + 1} - Predicted Values:`}
+            {/* <br />
             Latitude: {marker.position[0].toFixed(6)}
             <br />
-            Longitude: {marker.position[1].toFixed(6)}
+            Longitude: {marker.position[1].toFixed(6)} */}
             <br />
-            Calculated TDS Value: {marker.nodeVal || 'N/A'}
+            Calculated Temperature: {temperatureValue}
             <br />
-            Flow: {flow}
+            Calculated TDS Values: {uTDSValue}
+            <br />
+            Calculated Total Flow: {totalFlowValue}
+            <br />
+            Calculated v_TDS: {vTDSValue}
+            <br />
+            Is Solenoid On: {isSolenoidOn ? 'Yes' : 'No'}
           </div>
         );
       } else {
@@ -553,15 +591,13 @@ function HomePage() {
       }
     };
     
-    
-    
   
     const buildSaltPopupContent = (index) => {
       const marker = saltmarkers[index];
       if (marker && clickedLatLng) {
         return (
           <div>
-            {`Marker ${index + 1} - Clicked Coordinates:`}
+            {`Salt Container ${index + 1} - Clicked Coordinates:`}
             <br />
             Latitude: {clickedLatLng.latitude}
             <br />
@@ -571,7 +607,7 @@ function HomePage() {
       } else {
         return (
           <div>
-            {`Marker ${index + 1} - Coordinates:`}
+            {`Salt Container ${index + 1} - Coordinates:`}
             <br />
             Latitude: {marker.position[0].toFixed(6)}
             <br />
@@ -586,7 +622,7 @@ function HomePage() {
       if (marker && clickedLatLng) {
         return (
           <div>
-            {`Marker ${index + 1} - Clicked Coordinates:`}
+            {`Soil Container ${index + 1} - Clicked Coordinates:`}
             <br />
             Latitude: {clickedLatLng.latitude}
             <br />
@@ -596,7 +632,7 @@ function HomePage() {
       } else {
         return (
           <div>
-            {`Marker ${index + 1} - Coordinates:`}
+            {`Soil Container ${index + 1} - Coordinates:`}
             <br />
             Latitude: {marker.position[0].toFixed(6)}
             <br />
@@ -605,19 +641,60 @@ function HomePage() {
         );
       }
     };
+
+    const getInitialNodeVal = async () => {
+      try {
+        const response = await axios.post('http://10.3.1.117:8080/nodeVal');
+        // const response = await axios.post('http://localhost:8080/nodeVal');
+        const temp = response.data['nodeVal_temp']
+        const utds = response.data['nodeVal_utds'];
+        const ctds = response.data['nodeVal_ctds']
+        const vol = response.data['nodeVal_vol']
+        console.log("Temparature: ", temp," utds: ", utds , " ctds: ",ctds," vol: ", vol);
+        return { temp, utds, ctds, vol };
+      } catch (error) {
+        console.error('Error fetching real-time data:', error);
+        return null; // Return null in case of an error
+      }
+    };
   
+    // const addMarker = async () => {
+    //   if (latitudeInput && longitudeInput) {
+    //     try{
+    //     // Get the initial nodeVal for the new marker
+    //     const initialNodeVal = await getInitialNodeVal();
+    
+    //     const newMarker = {
+    //       position: [parseFloat(latitudeInput), parseFloat(longitudeInput)],
+    //       temparature: initialNodeVal.temp || 0,
+    //       u_tds: initialNodeVal.utds || 0,
+    //       total_flow: initialNodeVal.ctds || 0,
+    //       v_tds: initialNodeVal.vol || 0,
+    //       nodeVal_utds: initialNodeVal.utds || 0,
+    //     };
+    
+    //     setMarkers([...markers, newMarker]);
+    //     setLatitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
+    //     setLongitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
+    //   }catch (error) {
+    //     console.error('Error adding marker:', error);
+    //   }
+    // }
+    // };
+
     const addMarker = async () => {
       if (latitudeInput && longitudeInput) {
         // Get the initial nodeVal for the new marker
         const initialNodeVal = await getInitialNodeVal();
+        console.log("initial val",initialNodeVal)
     
         const newMarker = {
           position: [parseFloat(latitudeInput), parseFloat(longitudeInput)],
-          temparature: 0,
-          u_tds: 0,
-          total_flow: 0,
-          v_tds: 0,
-          nodeVal: initialNodeVal,
+          temparature: initialNodeVal ? initialNodeVal.temp || 0 : 0,
+          u_tds: initialNodeVal ? initialNodeVal.utds || 0 : 0,
+          total_flow: initialNodeVal ? initialNodeVal.ctds || 0 : 0,
+          v_tds: initialNodeVal ? initialNodeVal.vol || 0 : 0,
+          nodeVal_utds: initialNodeVal ? initialNodeVal.utds || 0 : 0,
         };
     
         setMarkers([...markers, newMarker]);
@@ -625,23 +702,10 @@ function HomePage() {
         setLongitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
       }
     };
+    
+    
+    
 
-    const getInitialNodeVal = async () => {
-      try {
-        const response = await axios.post('http://10.3.1.117:8080/nodeVal');
-        const data = response.data['nodeVal'];
-        console.log("Initial Node Value = ", data);
-        return data;
-      } catch (error) {
-        console.error('Error fetching real-time data:', error);
-        return null; // Return null in case of an error
-      }
-    };
-    
-        
-    
-    
-  
     const addSaltMarker = () => {
       if (latitudeInput && longitudeInput) {
         const newMarker = {
@@ -671,8 +735,6 @@ function HomePage() {
         setLongitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
       }
     };
-  
-    
   
     useEffect(() => {
       const map = mapRef.current;
@@ -714,19 +776,7 @@ function HomePage() {
     }, [mapRef.current]);
     
     const [popupContent, setPopupContent] = useState(null);
-  
-    // const handleRectangleClick = (rectangleId) => {
-    //   // Define the content for the popup based on the clicked rectangle
-    //   if (rectangleId === 1) {
-    //     setPopupContent('Soil Tank!');
-    //   } else if (rectangleId === 2) {
-    //     setPopupContent('Salt Tank!');
-    //   }
-    //   // Add more conditions for other rectangles if needed
-    // };
-    const handleRectangleClick = (name) => {
-      setPopupContent(`Clicked on ${name}`);
-    };
+
 
     const [currentColor1, setCurrentColor1] = useState('red');
     const [currentColor2, setCurrentColor2] = useState('red');
@@ -763,8 +813,6 @@ function HomePage() {
     
     return (
       <div>
-        {/* TEMPORARY BUTTON UNTIL ACTUATION FRONTEND GETS BUILT */}
-        {/* <button onClick={actuationToBackend}>Send Array to Backend</button> */}
         <NavigationBar/>
         <h1 style={{ textAlign: 'center' }}>Digital Twin Water Simulation</h1>
         <div className="main" id="map" style={{ width: '100%', textAlign: 'center' }}>
