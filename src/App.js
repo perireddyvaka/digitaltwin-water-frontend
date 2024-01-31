@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 // import { BrowserRouter as Router, Route } from 'react-router-dom';
 import ActuationPage from './pages/ActuationPage';
 import HomePage from './pages/HomePage';
+import Dashboard from './pages/Dashboard';
 // import { MapContainer, TileLayer, Polyline, Marker, Popup, Polygon, Rectangle } from 'react-leaflet';
 // import 'leaflet/dist/leaflet.css';
 // import CustomCircleMarker from './components/CustomCircleMarker';
@@ -18,7 +19,8 @@ function App(){
   return (
     <>
     <Routes>
-      <Route path='/' element={<HomePage />} />
+      <Route path='/' element={<Dashboard />} />
+      <Route path='/simulation' element={<HomePage />} />
       <Route path='actuation' element={<ActuationPage/>} />
     </Routes>
     </>
