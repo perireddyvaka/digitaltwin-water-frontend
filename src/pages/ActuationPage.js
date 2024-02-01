@@ -21,7 +21,7 @@ function ActuationPage() {
 
 
   useEffect(() => {
-    console.log(`${isOn.valve1 ? 1 : 0},${isOn.valve3 ? 1 : 0}`);
+    console.log(`${isOn.valve1 ? 0 : 1},${isOn.valve3 ? 0 : 1}`);
     sendArrayToBackend(); // Call the function to send the array whenever values change
   }, [isOn.valve1, isOn.valve3]);
 
@@ -32,7 +32,7 @@ function ActuationPage() {
   const sendArrayToBackend = async () => {
     try {
       // Dynamically generate array based on the state of valve1 and valve3
-      const arrayToSend = [isOn.valve1 ? 1 : 0, isOn.valve3 ? 1 : 0];
+      const arrayToSend = [isOn.valve1 ? 0 : 1, isOn.valve3 ? 0 : 1];
 
       const response = await axios.post('http://10.3.1.117:8080/actuation', { array: arrayToSend });
       console.log('Array sent to backend:', arrayToSend);
