@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 // import { BrowserRouter as Router, Route } from 'react-router-dom';
 import ActuationPage from './pages/ActuationPage';
-import HomePage from './pages/HomePage';
 import Dashboard from './pages/Dashboard';
 // import { MapContainer, TileLayer, Polyline, Marker, Popup, Polygon, Rectangle } from 'react-leaflet';
 // import 'leaflet/dist/leaflet.css';
@@ -14,13 +13,14 @@ import {Routes, Route} from "react-router-dom";
 // import Swal from 'sweetalert2';
 // import axios from 'axios';
 import './App.css';
+import SimulationPage from './pages/SimulationPage';
 
 function App(){
   return (
     <>
     <Routes>
       <Route path='/' element={<Dashboard />} />
-      <Route path='/simulation' element={<HomePage />} />
+      <Route path='/simulation' element={<SimulationPage />} />
       <Route path='actuation' element={<ActuationPage/>} />
     </Routes>
     </>

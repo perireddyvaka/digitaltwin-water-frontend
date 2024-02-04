@@ -8,6 +8,7 @@ import { IoIosWater } from 'react-icons/io';
 import { BsFillBoxFill } from "react-icons/bs";
 import { GiValve } from "react-icons/gi";
 import L from 'leaflet';
+import 'leaflet-rotatedmarker';
 import ReactDOMServer from 'react-dom/server';
 import Swal from 'sweetalert2';
 import axios from 'axios';
@@ -97,7 +98,7 @@ const data = [
 ];
 
 // Main Home Page Function
-function HomePage() {
+function SimulationPage() {
     const [markers, setMarkers] = useState([]);
     const [saltmarkers, setSaltMarkers] = useState([]);
     const [soilmarkers, setSoilMarkers] = useState([]);
@@ -113,6 +114,10 @@ function HomePage() {
   
     const [lastNodeCrossed, setLastNodeCrossed] = useState(null);
     const [nodeVal_utds, setnodeVal_utds] = useState(null)
+
+    const [saltContainerCount, setSaltContainerCount] = useState(0);
+    const [soilContainerCount, setSoilContainerCount] = useState(0);
+
   const [realTimeLocation, setRealTimeLocation] = useState({
     latitude: 0,
     longitude: 0
@@ -505,7 +510,7 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
           const data = response.data;
           // console.log("real time loc = ", data)
           setRealTimeLocation(data);
-          console.log("rtl = ", realTimeLocation);
+          // console.log("rtl = ", realTimeLocation);
         } catch (error) {
           console.error('Error fetching real-time data:', error);
         }
@@ -524,7 +529,7 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
         try {
           const response = await axios.post('http://10.3.1.117:8080/acknowledgment');
           const data = response.data;
-          console.log("ack = ", data)
+          // console.log("ack = ", data)
   
         } catch (error) {
           console.error('Error fetching real-time data:', error);
@@ -658,29 +663,10 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
       }
     };
   
-    // const addMarker = async () => {
-    //   if (latitudeInput && longitudeInput) {
-    //     try{
-    //     // Get the initial nodeVal for the new marker
-    //     const initialNodeVal = await getInitialNodeVal();
-    
-    //     const newMarker = {
-    //       position: [parseFloat(latitudeInput), parseFloat(longitudeInput)],
-    //       temparature: initialNodeVal.temp || 0,
-    //       u_tds: initialNodeVal.utds || 0,
-    //       total_flow: initialNodeVal.ctds || 0,
-    //       v_tds: initialNodeVal.vol || 0,
-    //       nodeVal_utds: initialNodeVal.utds || 0,
-    //     };
-    
-    //     setMarkers([...markers, newMarker]);
-    //     setLatitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
-    //     setLongitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
-    //   }catch (error) {
-    //     console.error('Error adding marker:', error);
-    //   }
-    // }
-    // };
+    const [containers, setContainers] = useState({
+      salt: 0,
+      sand: 0,
+    });
 
     const addMarker = async () => {
       if (latitudeInput && longitudeInput) {
@@ -696,6 +682,33 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
           v_tds: initialNodeVal ? initialNodeVal.vol || 0 : 0,
           nodeVal_utds: initialNodeVal ? initialNodeVal.utds || 0 : 0,
         };
+        
+        const oppositeCorner = [
+          newMarker.position[0] + 0.01,
+          newMarker.position[1] + 0.01,
+        ];
+    
+
+    // Calculate the coordinates of all four corners of the rotated rectangle
+    const halfWidth = 0.00009; // Half of the width for a 0.00009 side length rectangle
+    const halfHeight = 0.00018; // Half of the height for a 0.00009 side length rectangle
+
+    const rectangleCoordinates = [
+      [newMarker.position[0] - halfWidth, newMarker.position[1] - halfHeight],
+      [newMarker.position[0] + halfWidth, newMarker.position[1] - halfHeight],
+      [newMarker.position[0] + halfWidth, newMarker.position[1] + halfHeight],
+      [newMarker.position[0] - halfWidth, newMarker.position[1] + halfHeight],
+    ];
+
+    console.log("Rectangle Coordinates:", rectangleCoordinates);
+
+    // Create a new polygon using L.polygon
+    const rectangle = L.polygon(rectangleCoordinates, {
+      rotationAngle: 45, // Rotate the rectangle by 45 degrees
+    });
+
+    // Add the rectangle to the map
+    rectangle.addTo(mapRef.current);
     
         setMarkers([...markers, newMarker]);
         setLatitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
@@ -703,38 +716,70 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
       }
     };
     
-    
-    
 
-    const addSaltMarker = () => {
+    const addSaltMarker = async () => {
       if (latitudeInput && longitudeInput) {
+        const initialNodeVal = await getInitialNodeVal();
+    
         const newMarker = {
           position: [parseFloat(latitudeInput), parseFloat(longitudeInput)],
-          temparature: 0,
-          u_tds: 0,
-          total_flow: 0,
-          v_tds: 0,
+          temparature: initialNodeVal ? initialNodeVal.temp || 0 : 0,
+          u_tds: initialNodeVal ? initialNodeVal.utds || 0 : 0,
+          total_flow: initialNodeVal ? initialNodeVal.ctds || 0 : 0,
+          v_tds: initialNodeVal ? initialNodeVal.vol || 0 : 0,
+          nodeVal_utds: initialNodeVal ? initialNodeVal.utds || 0 : 0,
         };
-        setSaltMarkers([...saltmarkers, newMarker]);
+
+        
+        // Check if the marker is within any pipe section
+        const isInSection = pipeSections.some((section) =>
+          isMarkerInPipeSection(newMarker.position, section)
+        );
+        const sectionNumber = getSectionNumber(newMarker.position);
+    
+        // Update counters based on the type of container and pipe section
+        if (isInSection) {
+          setSaltMarkers([...saltmarkers, newMarker]);
+          setSaltContainerCount((prevCount) => prevCount + 1);
+          console.log(`Salt Container added to section ${sectionNumber}. Total in section: ${saltContainerCount + 1}`);
+        }
+    
         setLatitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
         setLongitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
       }
     };
-  
-    const addSoilMarker = () => {
+    
+    const addSoilMarker = async () => {
       if (latitudeInput && longitudeInput) {
+        const initialNodeVal = await getInitialNodeVal();
+    
         const newMarker = {
           position: [parseFloat(latitudeInput), parseFloat(longitudeInput)],
-          temparature: 0,
-          u_tds: 0,
-          total_flow: 0,
-          v_tds: 0,
+          temparature: initialNodeVal ? initialNodeVal.temp || 0 : 0,
+          u_tds: initialNodeVal ? initialNodeVal.utds || 0 : 0,
+          total_flow: initialNodeVal ? initialNodeVal.ctds || 0 : 0,
+          v_tds: initialNodeVal ? initialNodeVal.vol || 0 : 0,
+          nodeVal_utds: initialNodeVal ? initialNodeVal.utds || 0 : 0,
         };
-        setSoilMarkers([...soilmarkers, newMarker]);
+    
+        // Check if the marker is within any pipe section
+        const isInSection = pipeSections.some((section) =>
+        isMarkerInPipeSection(newMarker.position, section)
+        );
+    
+        // Update counters based on the type of container and pipe section
+        if (isInSection) {
+          setSoilMarkers([...soilmarkers, newMarker]);
+          setSoilContainerCount((prevCount) => prevCount + 1);
+          console.log(`Soil Container added to section. Total in section: ${soilContainerCount + 1}`);
+        }
+    
         setLatitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
         setLongitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
       }
     };
+    
+    
   
     useEffect(() => {
       const map = mapRef.current;
@@ -1062,6 +1107,6 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
     );
 }
 
-export default HomePage;
+export default SimulationPage;
 
   
