@@ -716,7 +716,6 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
       }
     };
     
-
     const addSaltMarker = async () => {
       if (latitudeInput && longitudeInput) {
         const initialNodeVal = await getInitialNodeVal();
@@ -729,26 +728,27 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
           v_tds: initialNodeVal ? initialNodeVal.vol || 0 : 0,
           nodeVal_utds: initialNodeVal ? initialNodeVal.utds || 0 : 0,
         };
-
-        
+    
         // Check if the marker is within any pipe section
-        const isInSection = pipeSections.some((section) =>
-          isMarkerInPipeSection(newMarker.position, section)
-        );
         const sectionNumber = getSectionNumber(newMarker.position);
     
         // Update counters based on the type of container and pipe section
-        if (isInSection) {
+        if (sectionNumber !== null) {
           setSaltMarkers([...saltmarkers, newMarker]);
-          setSaltContainerCount((prevCount) => prevCount + 1);
-          console.log(`Salt Container added to section ${sectionNumber}. Total in section: ${saltContainerCount + 1}`);
+    
+          // Use the state updater function to get the most recent state
+          setSaltContainerCount((prevCount) => {
+            const updatedCount = { ...prevCount, [sectionNumber]: (prevCount[sectionNumber] || 0) + 1 };
+            console.log("Salt Container counts:", updatedCount);
+            return updatedCount;
+          });
         }
     
         setLatitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
         setLongitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
       }
     };
-    
+
     const addSoilMarker = async () => {
       if (latitudeInput && longitudeInput) {
         const initialNodeVal = await getInitialNodeVal();
@@ -763,22 +763,24 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
         };
     
         // Check if the marker is within any pipe section
-        const isInSection = pipeSections.some((section) =>
-        isMarkerInPipeSection(newMarker.position, section)
-        );
+        const sectionNumber = getSectionNumber(newMarker.position);
     
         // Update counters based on the type of container and pipe section
-        if (isInSection) {
+        if (sectionNumber !== null) {
           setSoilMarkers([...soilmarkers, newMarker]);
-          setSoilContainerCount((prevCount) => prevCount + 1);
-          console.log(`Soil Container added to section. Total in section: ${soilContainerCount + 1}`);
+    
+          // Use the state updater function to get the most recent state
+          setSoilContainerCount((prevCount) => {
+            const updatedCount = { ...prevCount, [sectionNumber]: (prevCount[sectionNumber] || 0) + 1 };
+            console.log("Soil Container counts:", updatedCount);
+            return updatedCount;
+          });
         }
     
         setLatitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
         setLongitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
       }
     };
-    
     
   
     useEffect(() => {
