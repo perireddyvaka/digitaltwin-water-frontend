@@ -376,9 +376,10 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
     };
 
     //NEW VALUE OF VIRTUAL NODE
-    const postPercentDist = async (arrayToSend) => {
+    const postPercentDist = async (arrayToSend, sectionNumber) => {
       try {
-        const response = await axios.post('http://10.3.1.117:8080/percent', { array: arrayToSend });
+        const response = await axios.post('http://10.3.1.117:8080/percent', { array: arrayToSend , sectionNumber});
+        // const response = await axios.post('http://localhost:8080/percent', { array: arrayToSend , SectionNumber});
         console.log('Array sent to backend:', arrayToSend);
       } catch (error) {
         console.error('Error sending array to backend:', error);
@@ -404,6 +405,7 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
       const longitude = e.latlng.lng;
       setClickedLatLng({ latitude, longitude });
       console.log(latitude, longitude);
+      const latlongpos = [latitude,longitude]
     
       console.log(
         'Is point near rectangle:',
@@ -432,7 +434,10 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
         if (percentage1 < 100) {
           percentage2 = percentage2 - 100;
         }
-    
+        
+        const sectionNumber = getSectionNumber(latlongpos);
+        console.log("Position Clicked in Section:",sectionNumber)
+
         console.log('Nearest Node 1:', dt_node_1);
         console.log('Nearest Node 2:', dt_node_2);
         console.log('Nearest Node 3:', dt_node_3);
@@ -443,7 +448,7 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
         console.log('Percentage along the Line 2-3:', percentage2.toFixed(2), '%');
         console.log('Percentage along the Line 3-1:', percentage3.toFixed(2), '%');
 
-        postPercentDist([percentage1, percentage2, percentage3]);
+        postPercentDist([percentage1, percentage2, percentage3], sectionNumber);
     
         // Proceed to add a marker
         const newMarker = {
@@ -712,32 +717,32 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
           nodeVal_utds: initialNodeVal ? initialNodeVal.utds || 0 : 0,
         };
         
-        const oppositeCorner = [
-          newMarker.position[0] + 0.01,
-          newMarker.position[1] + 0.01,
-        ];
+        // const oppositeCorner = [
+        //   newMarker.position[0] + 0.01,
+        //   newMarker.position[1] + 0.01,
+        // ];
     
 
-    // Calculate the coordinates of all four corners of the rotated rectangle
-    const halfWidth = 0.00009; // Half of the width for a 0.00009 side length rectangle
-    const halfHeight = 0.00018; // Half of the height for a 0.00009 side length rectangle
+        // // Calculate the coordinates of all four corners of the rotated rectangle
+        // const halfWidth = 0.00009; // Half of the width for a 0.00009 side length rectangle
+        // const halfHeight = 0.00018; // Half of the height for a 0.00009 side length rectangle
 
-    const rectangleCoordinates = [
-      [newMarker.position[0] - halfWidth, newMarker.position[1] - halfHeight],
-      [newMarker.position[0] + halfWidth, newMarker.position[1] - halfHeight],
-      [newMarker.position[0] + halfWidth, newMarker.position[1] + halfHeight],
-      [newMarker.position[0] - halfWidth, newMarker.position[1] + halfHeight],
-    ];
+        // const rectangleCoordinates = [
+        //   [newMarker.position[0] - halfWidth, newMarker.position[1] - halfHeight],
+        //   [newMarker.position[0] + halfWidth, newMarker.position[1] - halfHeight],
+        //   [newMarker.position[0] + halfWidth, newMarker.position[1] + halfHeight],
+        //   [newMarker.position[0] - halfWidth, newMarker.position[1] + halfHeight],
+        // ];
 
-    console.log("Rectangle Coordinates:", rectangleCoordinates);
+        // console.log("Rectangle Coordinates:", rectangleCoordinates);
 
-    // Create a new polygon using L.polygon
-    const rectangle = L.polygon(rectangleCoordinates, {
-      rotationAngle: 45, // Rotate the rectangle by 45 degrees
-    });
+        // // Create a new polygon using L.polygon
+        // const rectangle = L.polygon(rectangleCoordinates, {
+        //   rotationAngle: 45, // Rotate the rectangle by 45 degrees
+        // });
 
-    // Add the rectangle to the map
-    // rectangle.addTo(mapRef.current);
+        // // Add the rectangle to the map
+        // // rectangle.addTo(mapRef.current);
     
         setMarkers([...markers, newMarker]);
         setLatitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
