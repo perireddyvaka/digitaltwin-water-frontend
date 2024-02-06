@@ -142,33 +142,62 @@ function SimulationPage() {
     pipe6: false,
   });
   
+  // const pipeSections = [
+  //   [
+  //     [17.447299287603173, 78.34906339645387],  // start coordinates for solenoid pipe 1
+  //     [17.446797760350986, 78.34966421127321],  // end coordinates for solenoid pipe 1
+  //   ],
+  //   [
+  //     [17.447739402218467, 78.34897220134737], // start coordinates for solenoid pipe 2
+  //     [17.44777010784964, 78.34901511669159] //end coordinates for solenoid pipe 2
+  //   ],
+  //   [
+  //     [17.447212288076706, 78.34919214248657], // start coordinates for solenoid pipe 3
+  //     [17.447457933691627, 78.34939599037172]  //end coordinates for solenoid pipe 3
+  //   ],
+  //   [
+  //     [17.446465113963484, 78.35006117820741],  // start coordinates for solenoid pipe 4
+  //     [17.446127349318246, 78.3504742383957],      // end coordinates for solenoid pipe 4
+  //   ],
+  //   [
+  //     [17.446997347892143, 78.34995925426485], // start coordinates for solenoid pipe 5
+  //     [17.446654466596936, 78.35035622119905]  //end coordinates for solenoid pipe 5
+  //   ],
+  //   [
+  //     [17.446465113963484, 78.35006117820741],  // start coordinates for solenoid pipe 6
+  //     [17.446127349318246, 78.3504742383957],      // end coordinates for solenoid pipe 6
+  //   ],
+
+  // ];
+
   const pipeSections = [
     [
-      [17.447299287603173, 78.34906339645387],  // start coordinates for solenoid pipe 1
-      [17.446797760350986, 78.34966421127321],  // end coordinates for solenoid pipe 1
+      [17.447309522838868, 78.34905266761781],  // start coordinates for solenoid pipe 1
+      [17.446685172410852, 78.34979295730592],  // end coordinates for solenoid pipe 1
     ],
     [
-      [17.447739402218467, 78.34897220134737], // start coordinates for solenoid pipe 2
-      [17.44777010784964, 78.34901511669159] //end coordinates for solenoid pipe 2
+      [17.447780343058888, 78.34900438785553], // start coordinates for solenoid pipe 2
+      [17.447463051305085, 78.34940671920778] //end coordinates for solenoid pipe 2
     ],
     [
-      [17.447212288076706, 78.34919214248657], // start coordinates for solenoid pipe 3
-      [17.447457933691627, 78.34939599037172]  //end coordinates for solenoid pipe 3
+      [17.447207170456213, 78.3491760492325], // start coordinates for solenoid pipe 3
+      [17.446685172410852, 78.34979295730592]  //end coordinates for solenoid pipe 3
     ],
     [
-      [17.446465113963484, 78.35006117820741],  // start coordinates for solenoid pipe 4
-      [17.446127349318246, 78.3504742383957],      // end coordinates for solenoid pipe 4
+      [17.447017818396827, 78.34993779659273],  // start coordinates for solenoid pipe 4
+      [17.446623760777843, 78.35037767887117],      // end coordinates for solenoid pipe 4
     ],
     [
-      [17.446997347892143, 78.34995925426485], // start coordinates for solenoid pipe 5
-      [17.446654466596936, 78.35035622119905]  //end coordinates for solenoid pipe 5
+      [17.446362761106773, 78.3501845598221], // start coordinates for solenoid pipe 5
+      [17.446117114016204, 78.35048496723176]  //end coordinates for solenoid pipe 5
     ],
     [
-      [17.446465113963484, 78.35006117820741],  // start coordinates for solenoid pipe 6
-      [17.446127349318246, 78.3504742383957],      // end coordinates for solenoid pipe 6
+      [17.44648558452794, 78.35004508495332],  // start coordinates for solenoid pipe 6
+      [17.446117114016204, 78.35048496723176],      // end coordinates for solenoid pipe 6
     ],
 
   ];
+
 // This is the pipeline where always the water flow is present 
   const alwaysFlowSections =[
     [
@@ -708,7 +737,7 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
     });
 
     // Add the rectangle to the map
-    rectangle.addTo(mapRef.current);
+    // rectangle.addTo(mapRef.current);
     
         setMarkers([...markers, newMarker]);
         setLatitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
@@ -740,6 +769,7 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
           setSaltContainerCount((prevCount) => {
             const updatedCount = { ...prevCount, [sectionNumber]: (prevCount[sectionNumber] || 0) + 1 };
             console.log("Salt Container counts:", updatedCount);
+            sendSaltContainerCount(updatedCount)
             return updatedCount;
           });
         }
@@ -773,6 +803,7 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
           setSoilContainerCount((prevCount) => {
             const updatedCount = { ...prevCount, [sectionNumber]: (prevCount[sectionNumber] || 0) + 1 };
             console.log("Soil Container counts:", updatedCount);
+            sendSoilContainerCount(updatedCount)
             return updatedCount;
           });
         }
@@ -781,6 +812,36 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
         setLongitudeInput((prev) => (prev === '' ? '' : (parseFloat(prev)).toString()));
       }
     };
+
+    const sendSaltContainerCount = async (saltArray) => {
+      try {
+        // Define your salt endpoint
+        const saltEndpoint = 'http://10.3.1.117:8080/salt'; // Replace with the actual salt endpoint
+    
+        // Send salt container count to the backend
+        await axios.post(saltEndpoint,saltArray );
+    
+        console.log('Salt Container Counts sent to backend:', saltArray);
+      } catch (error) {
+        console.error('Error sending salt container counts to backend:', error);
+      }
+    };
+    
+    const sendSoilContainerCount = async (soilArray) => {
+      try {
+        // Define your soil endpoint
+        const soilEndpoint = 'http://localhost:8080/soil'; // Replace with the actual soil endpoint
+    
+        // Send soil container count to the backend
+        await axios.post(soilEndpoint, soilArray );
+    
+        console.log('Soil Container Counts sent to backend:', soilArray);
+      } catch (error) {
+        console.error('Error sending soil container counts to backend:', error);
+      }
+    };
+    
+
     
   
     useEffect(() => {
