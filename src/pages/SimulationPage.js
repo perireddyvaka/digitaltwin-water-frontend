@@ -100,7 +100,7 @@ const data = [
 // Main Home Page Function
 function SimulationPage() {
     const [markers, setMarkers] = useState([]);
-    const [saltmarkers, setSaltMarkers] = useState([]);
+    const [sandmarkers, setsandMarkers] = useState([]);
     const [soilmarkers, setSoilMarkers] = useState([]);
     const [clickedNode, setClickedNode] = useState(null);
     const [isAddingMarker, setIsAddingMarker] = useState(false);
@@ -115,7 +115,7 @@ function SimulationPage() {
     const [lastNodeCrossed, setLastNodeCrossed] = useState(null);
     const [nodeVal_utds, setnodeVal_utds] = useState(null)
 
-    const [saltContainerCount, setSaltContainerCount] = useState(0);
+    const [sandContainerCount, setsandContainerCount] = useState(0);
     const [soilContainerCount, setSoilContainerCount] = useState(0);
 
   const [realTimeLocation, setRealTimeLocation] = useState({
@@ -307,8 +307,8 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
     const clearMarkers = () => {
       setMarkers([]);
     };
-    const clearSaltMarkers = () => {
-      setSaltMarkers([]);
+    const clearsandMarkers = () => {
+      setsandMarkers([]);
     };
     const clearSoilMarkers = () => {
       setSoilMarkers([]);
@@ -321,10 +321,10 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
         setSelectedMarkerIndex(null);
       }
     };
-    const handleRemoveSaltMarker = (index) => {
+    const handleRemovesandMarker = (index) => {
       if (index !== null) {
-        const updatedSaltMarkers = saltmarkers.filter((_, i) => i !== index);
-        setSaltMarkers(updatedSaltMarkers);
+        const updatedsandMarkers = sandmarkers.filter((_, i) => i !== index);
+        setsandMarkers(updatedsandMarkers);
         setSelectedMarkerIndex(null);
       }
     };
@@ -631,12 +631,12 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
     };
     
   
-    const buildSaltPopupContent = (index) => {
-      const marker = saltmarkers[index];
+    const buildsandPopupContent = (index) => {
+      const marker = sandmarkers[index];
       if (marker && clickedLatLng) {
         return (
           <div>
-            {`Salt Container ${index + 1} - Clicked Coordinates:`}
+            {`sand Container ${index + 1} - Clicked Coordinates:`}
             <br />
             Latitude: {clickedLatLng.latitude}
             <br />
@@ -646,7 +646,7 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
       } else {
         return (
           <div>
-            {`Salt Container ${index + 1} - Coordinates:`}
+            {`sand Container ${index + 1} - Coordinates:`}
             <br />
             Latitude: {marker.position[0].toFixed(6)}
             <br />
@@ -698,7 +698,7 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
     };
   
     const [containers, setContainers] = useState({
-      salt: 0,
+      sand: 0,
       sand: 0,
     });
 
@@ -750,7 +750,7 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
       }
     };
     
-    const addSaltMarker = async () => {
+    const addsandMarker = async () => {
       if (latitudeInput && longitudeInput) {
         const initialNodeVal = await getInitialNodeVal();
     
@@ -768,13 +768,13 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
     
         // Update counters based on the type of container and pipe section
         if (sectionNumber !== null) {
-          setSaltMarkers([...saltmarkers, newMarker]);
+          setsandMarkers([...sandmarkers, newMarker]);
     
           // Use the state updater function to get the most recent state
-          setSaltContainerCount((prevCount) => {
+          setsandContainerCount((prevCount) => {
             const updatedCount = { ...prevCount, [sectionNumber]: (prevCount[sectionNumber] || 0) + 1 };
-            console.log("Salt Container counts:", updatedCount);
-            sendSaltContainerCount(updatedCount)
+            console.log("sand Container counts:", updatedCount);
+            sendsandContainerCount(updatedCount)
             return updatedCount;
           });
         }
@@ -820,17 +820,17 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
       }
     };
 
-    const sendSaltContainerCount = async (saltArray) => {
+    const sendsandContainerCount = async (sandArray) => {
       try {
-        // Define your salt endpoint
-        const saltEndpoint = 'http://10.3.1.117:8080/salt'; // Replace with the actual salt endpoint
+        // Define your sand endpoint
+        const sandEndpoint = 'http://10.3.1.117:8080/sand'; // Replace with the actual sand endpoint
     
-        // Send salt container count to the backend
-        await axios.post(saltEndpoint,saltArray );
+        // Send sand container count to the backend
+        await axios.post(sandEndpoint,sandArray );
     
-        console.log('Salt Container Counts sent to backend:', saltArray);
+        console.log('sand Container Counts sent to backend:', sandArray);
       } catch (error) {
-        console.error('Error sending salt container counts to backend:', error);
+        console.error('Error sending sand container counts to backend:', error);
       }
     };
     
@@ -964,7 +964,7 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
               </Marker>
             ))}
   
-            {saltmarkers.map((marker, index) => (
+            {sandmarkers.map((marker, index) => (
               <Marker
                 key={index}
                 position={marker.position}
@@ -976,7 +976,7 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
                   })
                 }
               >
-                <Popup>{buildSaltPopupContent(index)}</Popup>
+                <Popup>{buildsandPopupContent(index)}</Popup>
               </Marker>
             ))}
   
@@ -1117,8 +1117,8 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
           
           <button onClick={addMarker}>Add Marker</button>
           <button onClick={clearMarkers}>Clear Markers</button>
-          <button onClick={addSaltMarker}>Add Salt Marker</button>
-          <button onClick={clearSaltMarkers}>Clear Salt Markers</button>
+          <button onClick={addsandMarker}>Add sand Marker</button>
+          <button onClick={clearsandMarkers}>Clear sand Markers</button>
           <button onClick={addSoilMarker}>Add Soil Marker</button>
           <button onClick={clearSoilMarkers}>Clear Soil Markers</button>
   
@@ -1144,13 +1144,13 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
                   </td>
                 </tr>
               ))}
-              {saltmarkers.map((marker, index) => (
+              {sandmarkers.map((marker, index) => (
                 <tr key={index}>
-                  <td>Salt Marker {index + 1}</td>
+                  <td>sand Marker {index + 1}</td>
                   <td>{marker.position[0].toFixed(6)}</td>
                   <td>{marker.position[1].toFixed(6)}</td>
                   <td>
-                    <button onClick={() => handleRemoveSaltMarker(index)}>
+                    <button onClick={() => handleRemovesandMarker(index)}>
                       Remove Marker
                     </button>
                   </td>
