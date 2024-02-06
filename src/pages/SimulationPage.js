@@ -799,6 +799,7 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
     
         // Check if the marker is within any pipe section
         const sectionNumber = getSectionNumber(newMarker.position);
+        console.log("Section Number for Soil", sectionNumber)
     
         // Update counters based on the type of container and pipe section
         if (sectionNumber !== null) {
@@ -809,6 +810,7 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
             const updatedCount = { ...prevCount, [sectionNumber]: (prevCount[sectionNumber] || 0) + 1 };
             console.log("Soil Container counts:", updatedCount);
             sendSoilContainerCount(updatedCount)
+            console.log("sendSoilContainerCount Function Completed")
             return updatedCount;
           });
         }
@@ -835,7 +837,8 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
     const sendSoilContainerCount = async (soilArray) => {
       try {
         // Define your soil endpoint
-        const soilEndpoint = 'http://localhost:8080/soil'; // Replace with the actual soil endpoint
+        const soilEndpoint = 'http://10.3.1.117:8080/soil'; 
+        // const soilEndpoint = 'http://localhost:8080/soil';
     
         // Send soil container count to the backend
         await axios.post(soilEndpoint, soilArray );
