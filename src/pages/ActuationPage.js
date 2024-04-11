@@ -65,13 +65,13 @@ function ActuationPage() {
         <MdOutlineInbox size={50} color="black" style={{position: 'absolute', top: '75%', left: '87%' }}/>
 
         <div style={{ position: 'absolute', top: '88%', left: '23%', textAlign: 'center' }}>
-            <div>Node 1</div>
+            <div>Node-1</div>
           </div>
           <div style={{ position: 'absolute', top: '88%', left: '55%', textAlign: 'center' }}>
-            <div>Node 2</div>
+            <div>Node-2</div>
           </div>
           <div style={{ position: 'absolute', top: '88%', left: '87%', textAlign: 'center' }}>
-            <div>Node 3</div>
+            <div>Node-3</div>
           </div>
 
       </div>
