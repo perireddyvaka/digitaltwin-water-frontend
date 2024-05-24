@@ -24,9 +24,12 @@ const fetchData = (setDescriptorsData, arr, nodeID) => {
 
 
 
+
 function CustomCircleMarker({ nodeData, setClickedNode }) {
   const { "Node Location": position, "Node ID": nodeID, "Data String Parameters": arr } = nodeData;
   const [descriptorsData, setDescriptorsData] = useState({})
+  const [latitude, setLatitude] = useState(0);
+  const [longitude, setLongitude] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -35,7 +38,29 @@ function CustomCircleMarker({ nodeData, setClickedNode }) {
 
     return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
 
-  }, )
+  },)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.post('http://10.3.1.117:8080/real-time-location');
+        const data = response.data;
+        // console.log("real time loc = ", data)
+        setLatitude(data.latitude);
+        setLongitude(data.longitude);
+
+        // console.log("rtl = ", realTimeLocation);
+      } catch (error) {
+        console.error('Error fetching real-time data:', error);
+      }
+    };
+
+    const intervalId = setInterval(fetchData, 3000); // Adjust the interval based on your requirements
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
 
   return (
     <CircleMarker center={position} pathOptions={{ fillColor: 'blue' }} radius={5}
@@ -49,6 +74,8 @@ function CustomCircleMarker({ nodeData, setClickedNode }) {
     >
       <Popup >
         <b>{nodeID}</b> <br />
+        <p>Latitude: {latitude}</p>
+        <p>Longitude: {longitude}</p>
         {arr.map((element, index) => (
           <p key={index}>{element} :{descriptorsData[element]}</p>
 
