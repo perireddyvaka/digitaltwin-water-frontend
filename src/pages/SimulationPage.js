@@ -378,7 +378,7 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
     //NEW VALUE OF VIRTUAL NODE
     const postPercentDist = async (arrayToSend, sectionNumber) => {
       try {
-        const response = await axios.post('http://10.3.1.117:8080/percent', { array: arrayToSend , sectionNumber});
+        const response = await axios.post('http://localhost:8080/percent', { array: arrayToSend , sectionNumber});
         // const response = await axios.post('http://localhost:8080/percent', { array: arrayToSend , SectionNumber});
         console.log('Array sent to backend:', arrayToSend);
       } catch (error) {
@@ -389,7 +389,7 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
 
     // const getNewValue = async () => {
     //   try {
-    //     const response = await axios.post('http://10.3.1.117:8080/nodeVal');
+    //     const response = await axios.post('http://10.I 3.1.117:8080/nodeVal');
     //     const utds = response.data['nodeVal_utds'];
     //     console.log("New Node Value = ", utds);
     //     setnodeVal_utds(utds); // Update this line
@@ -540,7 +540,7 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
     useEffect(() => {
       const fetchData = async () => {
         try {
-          const response = await axios.post('http://10.3.1.117:8080/real-time-location');
+          const response = await axios.post('http://localhost:8080/real-time-location');
           const data = response.data;
           // console.log("real time loc = ", data)
           setRealTimeLocation(data);
@@ -561,7 +561,7 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
     useEffect(() => {
       const getAckFrontend = async () => {
         try {
-          const response = await axios.post('http://10.3.1.117:8080/acknowledgment');
+          const response = await axios.post('http://localhost:8080/acknowledgment');
           const data = response.data;
           // console.log("ack = ", data)
   
@@ -683,7 +683,7 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
 
     const getInitialNodeVal = async () => {
       try {
-        const response = await axios.post('http://10.3.1.117:8080/nodeVal');
+        const response = await axios.post('http://localhost:8080/nodeVal');
         // const response = await axios.post('http://localhost:8080/nodeVal');
         const temp = response.data['nodeVal_temp']
         const utds = response.data['nodeVal_utds'];
@@ -823,7 +823,7 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
     const sendsandContainerCount = async (sandArray) => {
       try {
         // Define your sand endpoint
-        const sandEndpoint = 'http://10.3.1.117:8080/sand'; // Replace with the actual sand endpoint
+        const sandEndpoint = 'http://localhost:8080/sand'; // Replace with the actual sand endpoint
     
         // Send sand container count to the backend
         await axios.post(sandEndpoint,sandArray );
@@ -837,7 +837,7 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
     const sendSoilContainerCount = async (soilArray) => {
       try {
         // Define your soil endpoint
-        const soilEndpoint = 'http://10.3.1.117:8080/soil'; 
+        const soilEndpoint = 'http://localhost:8080/soil'; 
         // const soilEndpoint = 'http://localhost:8080/soil';
     
         // Send soil container count to the backend
@@ -884,7 +884,7 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
   
       const nodes = ["Node-1", "Node-2", "Node-3"];
       for (let i = 0; i < nodes.length; i++) {
-        let url = "http://10.3.1.117:8080/desc/" + nodes[i];
+        let url = "http://localhost:8080/data/" + nodes[i];
         axios.get(url).then((response) => {
           data[nodes[i]] = response.data;
         });
@@ -948,6 +948,7 @@ const distanceToLineFromPoint = (point, lineStart, lineEnd) => {
                 setClickedNode={setClickedNode}
               />
             ))}
+            
             {markers.map((marker, index) => (
               <Marker
                 key={index}
