@@ -27,8 +27,8 @@ function ActuationPage() {
 
   const [units, setUnits] = useState({
     Temperature: "°C",
-    uncompensated_tds: "ppm",
-    compensated_tds: "ppm",
+    Uncompensated_TDS: "ppm",
+    Compensated_TDS: "ppm",
     Voltage_TDS: "V",
   });
 
@@ -83,6 +83,8 @@ function ActuationPage() {
         value: value,
         units: units[key] || '',
       }));
+      console.log(dataArray)
+      console.log(data)
       setNodeData(dataArray);
       setLoading(false);
     } catch (error) {
