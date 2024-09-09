@@ -6,7 +6,7 @@ import SCRCLOGO from './images/scrc_logo.png';
 
 const NavigationBar = () => {
   return (
-    <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', zIndex: 1000 }}>
+    <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', zIndex: 1000, }}>
       <nav className="navbar">
         <Link to="/">
           <div className="navbar__logo">
