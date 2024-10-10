@@ -14,6 +14,7 @@ import {Routes, Route} from "react-router-dom";
 // import axios from 'axios';
 import './App.css';
 import SimulationPage from './pages/SimulationPage';
+import ActuationPage2 from './pages/ActuationPage2';
 
 function App(){
   return (
@@ -22,6 +23,7 @@ function App(){
       <Route path='/' element={<Dashboard />} />
       <Route path='/simulation' element={<SimulationPage />} />
       <Route path='actuation' element={<ActuationPage/>} />
+      <Route path='actuation2' element={<ActuationPage2/>} />
     </Routes>
     </>
   )
