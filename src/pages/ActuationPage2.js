@@ -144,7 +144,7 @@ const handleSoilClick = (weight) => {
     <div style={{ overflowY: 'hidden', height: '100vh', display: 'flex', flexDirection: 'column' }}>
       <NavigationBar />
       {/* <div style={{ position: 'relative', flex: 1 }}> */}
-        <img src={Circuit2} alt="circuit" style={{ width: '100vw', height: '70vh', objectFit: 'contain' }} />
+        <img src={Circuit2} alt="circuit" style={{ width: '100vw', height: '60vh', objectFit: 'contain' }} />
            {/* Motor Image */}
           <div style={{ position: 'absolute', top: '6.1vw', left: '16vw' }}>
           <style>{keyframes}</style>
@@ -225,7 +225,7 @@ const handleSoilClick = (weight) => {
           <div>Container2</div>
         </div>
 
-        <GiWaterTower size={150} color="darkblue" style={{ position: 'absolute', top: '3.8vw', left: '-0.5vw', height:
+        <GiWaterTower size={150} color="darkblue" style={{ position: 'absolute', top: '4.5vw', left: '-0.5vw', height:
           '10.5vw' }} />
 
         {/* Nodes with Click Handlers */}
