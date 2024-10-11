@@ -18,7 +18,7 @@ const NavigationBar = () => {
         <Link to="/" className="navbar__button">
           Dashboard
         </Link>
-        <Link to="/actuation" className="navbar__button">
+        <Link to="/actuation2" className="navbar__button">
           Actuation
         </Link>
         <Link to="/simulation" className="navbar__button">

@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import circuit from '../images/circuit.png';
+// import circuit from '../images/circuit.png';
 import { GiWaterTower, GiValve } from "react-icons/gi";
-import { MdOutlineInbox } from "react-icons/md";
-import { FaBoxArchive } from "react-icons/fa6";
+// import { MdOutlineInbox } from "react-icons/md";
+import { FaArchive } from "react-icons/fa"; // Import FaArchive instead of FaBoxArchive
 import axios from 'axios';
-import InstructionBox from '../components/InstructionBox/InstructionBox';
+// import InstructionBox from '../components/InstructionBox/InstructionBox';
 import Motor from '../images/Motor.png';
 import WaterQualityNode from '../images/wqn.png';
-import Circuit2 from '../images/final2.png';
+import Circuit2 from '../images/final4.png';
 import NavigationBar from '../components/Navigation/Navigation';
-
 
 function ActuationPage() {
   const [isOn, setIsOn] = useState({
@@ -24,6 +23,7 @@ function ActuationPage() {
   const [nodeData, setNodeData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [highlightedNode, setHighlightedNode] = useState(null);
+  const [feedbackMessage, setFeedbackMessage] = useState(''); // State for feedback messages
 
   const [units, setUnits] = useState({
     Temperature: "°C",
@@ -41,6 +41,38 @@ function ActuationPage() {
     setIsOn((prevState) => ({ ...prevState, [valve]: !prevState[valve] }));
   };
 
+   // Function to send the contamination request
+   const sendContaminationRequest = async (quantity, type) => {
+    try {
+        console.log('Sending request with data:', { quantity, type });
+        const response = await axios.post('http://localhost:8081/calculate_contamination', {
+            quantity,
+            type,
+        });
+        setFeedbackMessage(`Success: ${response.data.message}`);
+    } catch (error) {
+        if (error.response) {
+            console.error("Error response data:", error.response.data);
+            setFeedbackMessage(`Error: ${error.response.data.message || error.response.statusText}`);
+        } else if (error.request) {
+            console.error("Error request:", error.request);
+            setFeedbackMessage('Error: No response from the server');
+        } else {
+            console.error("Error message:", error.message);
+            setFeedbackMessage(`Error: ${error.message}`);
+        }
+    }
+};
+
+// Handlers for button clicks
+const handleSandClick = (weight) => {
+    sendContaminationRequest(weight, 'sand');
+};
+
+const handleSoilClick = (weight) => {
+    sendContaminationRequest(weight, 'soil');
+};
+
   const sendArrayToBackend = async () => {
     try {
       // Dynamically generate array based on the state of valve1 and valve3
@@ -53,15 +85,17 @@ function ActuationPage() {
     }
   };
 
-  const toggleMotor = async (state) => {
-    setMotorRunning(state);
-    const url = state
+  const toggleMotor = async () => {
+    const newMotorState = !motorRunning;
+    setMotorRunning(newMotorState);
+
+    const url = newMotorState
       ? 'https://smartcitylivinglab.iiit.ac.in/zf-backend-api/motor/actuation/1'
       : 'https://smartcitylivinglab.iiit.ac.in/zf-backend-api/motor/actuation/0';
 
     try {
-      const response = await axios.post(url);
-      console.log(`Motor ${state ? 'On' : 'Off'} request sent`);
+      await axios.post(url);
+      console.log(`Motor ${newMotorState ? 'On' : 'Off'} request sent`);
     } catch (error) {
       console.error('Error sending motor request:', error);
     }
@@ -107,38 +141,31 @@ function ActuationPage() {
   `;
 
   return (
-    <div style={{ overflowY: 'hidden', height: '47vw'}}>
+    <div style={{ overflowY: 'hidden', height: '100vh', display: 'flex', flexDirection: 'column' }}>
       <NavigationBar />
-      <div style={{ position: 'relative' }}>
-        <img src={Circuit2} alt="circuit" style={{ width: '100%', height: '50vh', marginTop: '5vw' }} />
-        {/* Motor Image and Buttons */}
-        <div style={{ position: 'relative' }}>
-      <style>
-        {keyframes}
-      </style>
-      <img
-        src={Motor}
-        alt="Motor"
-        style={{
-          width: '4%',
-          cursor: 'pointer',
-          position: 'relative',
-          top: '-23vw',
-          left: '19%',
-          transform: "scaleX(-1)",
-          ...(motorRunning ? spinningStyle : {}),
-        }}
-      />
-      <div style={{ position: 'absolute', top: '-18.8vw', left: '16.7%' }}>
-        <button onClick={() => toggleMotor(true)}>On</button>
-        <button onClick={() => toggleMotor(false)}>Off</button>
-      </div>
-    </div>
+      {/* <div style={{ position: 'relative', flex: 1 }}> */}
+        <img src={Circuit2} alt="circuit" style={{ width: '100vw', height: '70vh', objectFit: 'contain' }} />
+           {/* Motor Image */}
+          <div style={{ position: 'absolute', top: '6.1vw', left: '16vw' }}>
+          <style>{keyframes}</style>
+          <img
+            src={Motor}
+            alt="Motor"
+            onClick={toggleMotor}
+            style={{
+              width: '4.5vw',
+              cursor: 'pointer',
+              transform: "scaleX(-1)",
+              ...(motorRunning ? spinningStyle : {}),
+            }}
+          />
+          
+          </div>
         {/* Valves and Tanks */}
         <GiValve
           size={45}
           color={isOn.valve1 ? 'green' : 'red'}
-          style={{ position: 'absolute', top: '77.5%', left: '28%' }}
+          style={{ position: 'absolute', top: '23vw', left: '37.5vw' }}
           onClick={() => {
             toggleIsOn('valve1');
             toggleIsOn('valve2');
@@ -147,29 +174,29 @@ function ActuationPage() {
         <GiValve
           size={45}
           color={isOn.valve2 ? 'green' : 'red'}
-          style={{ position: 'absolute', top:'59%', left: '28.5%', transform: 'rotate(90deg)' }}
+          style={{ position: 'absolute', top: '15vw', left: '26vw', transform: 'rotate(90deg)' }}
           onClick={() => {
-            toggleIsOn('valve2');
+            toggleIsOn('valve2'); 
             toggleIsOn('valve1');
           }}
         />
         <GiValve
           size={45}
           color={isOn.valve2 ? 'green' : 'red'}
-          style={{ position: 'absolute', top: '59%', left: '51.2%', transform: 'rotate(270deg)' }}
+          style={{ position: 'absolute', top: '15vw', left: '50.7vw', transform: 'rotate(270deg)' }}
           onClick={() => {
             toggleIsOn('valve2');
             toggleIsOn('valve1');
           }}
         />
-        <FaBoxArchive size={50} color="brown" style={{ position: 'absolute', top: '45%', left: '39.5%' }} />
-        <div style={{ position: 'absolute', top: '55%', left: '39.2%', textAlign: 'center' }}>
-          <div>Soil tank</div>
+        <FaArchive size={50} color="brown" style={{ position: 'absolute', top: '9vw', left: '38vw' }} />
+        <div style={{ position: 'absolute', top: '12.4vw', left: '37vw', textAlign: 'center' }}>
+          <div>Container1</div>
         </div>
         <GiValve
           size={45}
           color={isOn.valve3 ? 'green' : 'red'}
-          style={{ position: 'absolute', top: '78%', left: '65%' }}
+          style={{ position: 'absolute', top: '23.3vw', left: '77vw' }}
           onClick={() => {
             toggleIsOn('valve3');
             toggleIsOn('valve4');
@@ -178,7 +205,7 @@ function ActuationPage() {
         <GiValve
           size={45}
           color={isOn.valve4 ? 'green' : 'red'}
-          style={{ position: 'absolute', top: '59%', left: '65.5%', transform: 'rotate(90deg)' }}
+          style={{ position: 'absolute', top: '15.5vw', left: '64.3vw', transform: 'rotate(90deg)' }}
           onClick={() => {
             toggleIsOn('valve4');
             toggleIsOn('valve3');
@@ -187,30 +214,31 @@ function ActuationPage() {
         <GiValve
           size={45}
           color={isOn.valve4 ? 'green' : 'red'}
-          style={{ position: 'absolute', top: '59%', left: '88%', transform: 'rotate(270deg)' }}
+          style={{ position: 'absolute', top: '15.5vw', left: '88.9vw', transform: 'rotate(270deg)' }}
           onClick={() => {
             toggleIsOn('valve4');
             toggleIsOn('valve3');
           }}
         />
-        <FaBoxArchive size={50} color="orange" style={{ position: 'absolute', top: '46%', left: '77%' }} />
-        <div style={{ position: 'absolute', top: '55.5%', left: '76.5%', textAlign: 'center' }}>
-          <div>Sand tank</div>
+        <FaArchive size={50} color="orange" style={{ position: 'absolute', top: '9.5vw', left: '77vw' }} />
+        <div style={{ position: 'absolute', top: '13vw', left: '76vw', textAlign: 'center' }}>
+          <div>Container2</div>
         </div>
 
-        <GiWaterTower size={150} color="darkblue" style={{ position: 'absolute', top: '11.5%', left: '2.5%', height: '10.5vw' }} />
+        <GiWaterTower size={150} color="darkblue" style={{ position: 'absolute', top: '3.8vw', left: '-0.5vw', height:
+          '10.5vw' }} />
 
         {/* Nodes with Click Handlers */}
        {/* Node 1 */}
-      <div
+      {/* <div
         style={{
           position: 'absolute',
           cursor: 'pointer',
-          top: '17%',
-          left: '13%',
-          border: highlightedNode === 'Node-1' ? '4px solid yellow' : 'none',
-          width: '50px',
-          height: '50px',
+          top: '4.5vw',
+          left: '12.5vw',
+          border: highlightedNode === 'Node-1' ? '0.3vw solid yellow' : 'none',
+          width: '3.3vw',
+          height: '6.9vh',
           boxSizing: 'border-box',
         }}
       >
@@ -223,19 +251,19 @@ function ActuationPage() {
           }}
           onClick={() => handleNodeClick('Node-1')}
         />
-      </div>
+      </div> */}
 
         
          {/* Node 2 */}
-      <div
+      {/* <div
         style={{
           position: 'absolute',
           cursor: 'pointer',
           top: '45%',
           left: '46%',
-          border: highlightedNode === 'Node-2' ? '4px solid yellow' : 'none',
-          width: '50px',
-          height: '50px',
+          border: highlightedNode === 'Node-2' ? '0.3vw solid yellow' : 'none',
+          width: '3.3vw',
+          height: '6.9vh',
           boxSizing: 'border-box',
         }}
       >
@@ -248,17 +276,17 @@ function ActuationPage() {
           }}
           onClick={() => handleNodeClick('Node-2')}
         />
-      </div>
+      </div> */}
          {/* Node 3 */}
-      <div
+      {/* <div
         style={{
           position: 'absolute',
           cursor: 'pointer',
           top: '45%',
           left: '83%',
-          border: highlightedNode === 'Node-3' ? '4px solid yellow' : 'none',
-          width: '50px',
-          height: '50px',
+          border: highlightedNode === 'Node-3' ? '0.3vw solid yellow' : 'none',
+          width: '3.3vw',
+          height: '6.9vh',
           boxSizing: 'border-box',
         }}
       >
@@ -271,9 +299,9 @@ function ActuationPage() {
           }}
           onClick={() => handleNodeClick('Node-3')}
         />
-      </div>
+      </div> */}
 
-        <div style={{ position: 'absolute', top: '27%', left: '13%', textAlign: 'center' }}>
+        {/* <div style={{ position: 'absolute', top: '8vw', left: '12.5vw', textAlign: 'center' }}>
         <div>Node 1</div>
         </div>
         <div style={{ position: 'absolute', top: '55.5%', left: '46%', textAlign: 'center' }}>
@@ -281,14 +309,29 @@ function ActuationPage() {
         </div>
         <div style={{ position: 'absolute', top: '55.5%', left: '83%', textAlign: 'center' }}>
           <div>Node 3</div>
-        </div>
-      </div>
+        </div> */}
+      {/* </div> */}
 
+
+      <div style={{ display: 'flex', position: 'absolute', top: '60vh', left: '29vw', gap: '26vw' }}>
+                <div style={{ textAlign: 'center' }}>
+                    <h3>Sand Configuration</h3>
+                    <button onClick={() => handleSandClick(200)}>200g</button>
+                    <button onClick={() => handleSandClick(600)}>600g</button>
+                    <button onClick={() => handleSandClick(800)}>800g</button>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                    <h3>Soil Configuration</h3>
+                    <button onClick={() => handleSoilClick(200)}>200g</button>
+                    <button onClick={() => handleSoilClick(300)}>300g</button>
+                    <button onClick={() => handleSoilClick(800)}>800g</button>
+                </div>
+            </div>
       {/* Container for Node Data Table, InstructionBox, and Icons and Description table */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '-50px', padding: '0 0vw', marginLeft: '2vw' }}>
+      {/* <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '-4vw', padding: '0 0vw', marginLeft: '2vw' }}> */}
         
         {/* Node Data Table */}
-        <div style={{ flex: 2, marginRight: '10px', width: '50vw', marginTop: '-30px', }}>
+        {/* <div style={{ flex: 2, marginRight: '10px', width: '50vw', marginTop: '-25px', }}>
           <h2> {selectedNode && `  ${selectedNode}`}</h2>
           <div style={{ maxHeight: '30vw' }}>
             {loading ? (
@@ -332,16 +375,16 @@ function ActuationPage() {
               <p>Please select a node to view data.</p>
             )}
           </div>
-        </div>
+        </div> */}
 
        {/* InstructionBox */}
-        <div style={{ flex: 1, marginRight: '1px' }}>
+        {/* <div style={{ flex: 1, marginRight: '1px' }}>
           <InstructionBox />
-        </div>
+        </div> */}
 
         {/* Icons and Description Table */}
-        <div style={{ flex: 1 }}>
-          <div style={{ marginTop: '0', width: '80%', overflowY: 'hidden' }}>
+        {/* <div style={{ flex: 1,  }}>
+          <div style={{ marginTop: '0', width: '80%',height: '35vh', overflowY: 'hidden' }}>
             <table style={{ width: '100%' }}>
               <thead>
                 <tr>
@@ -352,7 +395,7 @@ function ActuationPage() {
             </table>
             <div
               style={{
-                maxHeight: '13vw',
+                maxHeight: ' 13vw',
                 overflowY: 'auto',
                 scrollbarWidth: 'none', // For Firefox
                 msOverflowStyle: 'none', // For Internet Explorer and Edge
@@ -398,13 +441,13 @@ function ActuationPage() {
                   </tr>
                   <tr>
                     <td>
-                      <FaBoxArchive size={25} color="brown" />
+                      <FaArchive size={25} color="brown" />
                     </td>
                     <td>Soil Tank</td>
                   </tr>
                   <tr>
                     <td>
-                      <FaBoxArchive size={25} color="orange" />
+                      <FaArchive size={25} color="orange" />
                     </td>
                     <td>Sand Tank</td>
                   </tr>
@@ -414,7 +457,7 @@ function ActuationPage() {
           </div>
         </div>
 
-        </div>
+        </div> */}
 
       </div>
    
@@ -422,4 +465,3 @@ function ActuationPage() {
 }
 
 export default ActuationPage;
-
